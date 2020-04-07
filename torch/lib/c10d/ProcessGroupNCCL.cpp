@@ -630,6 +630,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::collective(
     Fn fn,
     PreProcess pre,
     PostProcess post) {
+    LOG(INFO) << "---------- PGNCCL: collective ------------";
   const auto devices = getDeviceList(inputs);
   const auto key = getKeyFromDevices(devices);
   auto& ncclComms = getNCCLComm(key, devices);
@@ -702,7 +703,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::allreduce(
     std::vector<at::Tensor>& tensors,
     const AllreduceOptions& opts) {
   check_gpu_tensors(tensors);
-
+    LOG(INFO) << "---------- PGNCCL: allreduce ------------";
   return collective(
       tensors,
       tensors,
@@ -732,7 +733,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::broadcast(
     std::vector<at::Tensor>& tensors,
     const BroadcastOptions& opts) {
   check_gpu_tensors(tensors);
-
+  LOG(INFO) << "---------- PGNCCL: broadcast ------------";
   return collective(
       tensors,
       tensors,
@@ -755,7 +756,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::reduce(
     std::vector<at::Tensor>& tensors,
     const ReduceOptions& opts) {
   check_gpu_tensors(tensors);
-
+    LOG(INFO) << "---------- PGNCCL: reduce ------------";
   return collective(
       tensors,
       tensors,
@@ -781,7 +782,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::allgather(
     std::vector<at::Tensor>& inputTensors,
     const AllgatherOptions& opts) {
   check_gpu_tensors(inputTensors);
-
+  LOG(INFO) << "---------- PGNCCL: allgather ------------";
   auto outputFlattened =
       flatten_for_scatter_gather(outputTensors, inputTensors, size_);
   check_gpu_tensors(outputFlattened);
@@ -823,6 +824,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::allgather_coalesced(
     std::vector<std::vector<at::Tensor>>& /* unused */,
     std::vector<at::Tensor>& /* unused */,
     const AllgatherOptions& /* unused */) {
+    LOG(INFO) << "---------- PGNCCL: allgather_coalesced ------------";
   throw std::runtime_error(
       "ProcessGroupNCCL does not support allgather_coalesced");
 }
@@ -832,7 +834,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::reduce_scatter(
     std::vector<std::vector<at::Tensor>>& inputTensors,
     const ReduceScatterOptions& opts) {
   check_gpu_tensors(outputTensors);
-
+    LOG(INFO) << "---------- PGNCCL: reduce_scatter ------------";
   auto inputFlattened =
       flatten_for_scatter_gather(inputTensors, outputTensors, size_);
   check_gpu_tensors(inputFlattened);
@@ -874,6 +876,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::reduce_scatter(
 std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::barrier(
     const BarrierOptions& opts) {
   std::vector<at::Device> devices;
+  c
   if (usedDeviceIdxs_.empty()) {
     // This means there is not yet a NCCL collective being called
     // Here we have to use the best guesses and will use a single GPU to call
