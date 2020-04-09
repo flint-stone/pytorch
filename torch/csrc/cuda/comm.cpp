@@ -35,7 +35,7 @@ struct unique_type_checker {
 };
 
 std::vector<Tensor> broadcast(const Tensor& tensor, IntArrayRef devices) {
-  LOG(INFO) << "---------- DDP: broadcast ------------";  
+  LOG(WARNING) << "---------- DDP: broadcast ------------";  
   if (tensor.is_cuda() && tensor.get_device() != devices[0])
     throw std::runtime_error("device of broadcasted tensor must appear as the "
                              "first on devices list");
@@ -102,7 +102,7 @@ std::vector<Tensor> broadcast(const Tensor& tensor, IntArrayRef devices) {
 // Similarly for reduce_add_coalesced, when the output are newly created
 // Variables.
 tensor_list2d broadcast_coalesced(TensorList tensors, IntArrayRef devices, size_t buffer_size) {
-  LOG(INFO) << "---------- DDP: broadcast_coalesced ------------";
+  LOG(WARNING) << "---------- DDP: broadcast_coalesced ------------";
   if (!std::all_of(tensors.begin(), tensors.end(),
                    [&](const at::Tensor& t) { return t.get_device() == devices[0]; })) {
     throw std::runtime_error("all tensors must be on devices[0]");
@@ -167,7 +167,7 @@ std::vector<at::Tensor> scatter(
     const c10::optional<std::vector<int64_t>>& chunk_sizes,
     int64_t dim,
     const c10::optional<std::vector<c10::optional<at::cuda::CUDAStream>>>& streams) {
-  LOG(INFO) << "---------- DDP: scatter ------------";
+  LOG(WARNING) << "---------- DDP: scatter ------------";
   std::vector<at::Tensor> chunks;
   if (chunk_sizes) {
     const int64_t chunk_size_sum =
@@ -215,7 +215,7 @@ at::Tensor gather(
     at::TensorList tensors,
     int64_t dim,
     c10::optional<int32_t> destination_index) {
-  LOG(INFO) << "---------- DDP: gather ------------";
+  LOG(WARNING) << "---------- DDP: gather ------------";
   TORCH_CHECK(!tensors.empty(), "Expected at least one tensor to gather from");
   at::Tensor result;
   int64_t total_size = 0;

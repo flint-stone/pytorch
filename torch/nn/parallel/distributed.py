@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 import copy
 import itertools
+import warnings
 
 import torch
 
@@ -231,7 +232,7 @@ class DistributedDataParallel(Module):
                  process_group=None, bucket_cap_mb=25,
                  find_unused_parameters=False,
                  check_reduction=False):
-
+        warnings.warn("Initilizing DDP Module!")
         super(DistributedDataParallel, self).__init__()
 
         assert any((p.requires_grad for p in module.parameters())), (

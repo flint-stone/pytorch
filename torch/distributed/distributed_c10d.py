@@ -356,6 +356,8 @@ def init_process_group(backend,
     global _default_pg
     global _default_pg_init_method
 
+
+    warnings.warn("Initializing Process Group! ")
     if not isinstance(timeout, timedelta):
         raise RuntimeError("Expected timeout argument to be of type"
                            "datetime.timedelta")

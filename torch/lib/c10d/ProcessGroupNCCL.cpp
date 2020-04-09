@@ -8,7 +8,7 @@
 
 #include <ATen/cuda/CUDAContext.h>
 #include <c10/cuda/CUDAGuard.h>
-
+#include <iostream>
 #include <c10d/Utils.hpp>
 
 namespace c10d {
@@ -233,7 +233,7 @@ void ProcessGroupNCCL::WorkNCCL::synchronize() {
           const auto& storeKey = getNcclAbortedCommStoreKey(
               buildNcclUniqueIdStr(ncclComm->getNcclId()));
           store_->set(storeKey, {});
-          LOG(INFO) << "Wrote aborted communicator id to store: " << storeKey;
+          LOG(WARNING) << "Wrote aborted communicator id to store: " << storeKey;
         }
         throw std::runtime_error("Operation timed out!");
       }
@@ -268,6 +268,8 @@ ProcessGroupNCCL::ProcessGroupNCCL(
       terminateWatchdog_(false),
       opTimeout_(opTimeout) {
   char* blockingWait = getenv(NCCL_BLOCKING_WAIT);
+  LOG(WARNING) << "NCCL BLOCKING WAIT " << std::string(NCCL_BLOCKING_WAIT);
+  std::cerr << "NCCL BLOCKING WAIT " << std::string(NCCL_BLOCKING_WAIT);
   try {
     if (blockingWait != nullptr) {
       auto val = std::stoi(blockingWait);
@@ -303,11 +305,11 @@ ProcessGroupNCCL::~ProcessGroupNCCL() {
 void ProcessGroupNCCL::ncclCommWatchdog() {
   try {
     ncclCommWatchdogInternal();
-    LOG(INFO) << "NCCL watchdog thread terminated normally";
+    LOG(WARNING) << "NCCL watchdog thread terminated normally";
   } catch (std::exception& e) {
-    LOG(INFO) << "NCCL watchdog thread terminated with exception: " << e.what();
+    LOG(WARNING) << "NCCL watchdog thread terminated with exception: " << e.what();
   } catch (...) {
-    LOG(INFO) << "NCCL watchdog thread terminated with unknown exception";
+    LOG(WARNING) << "NCCL watchdog thread terminated with unknown exception";
   }
 }
 
@@ -328,10 +330,10 @@ void ProcessGroupNCCL::ncclCommWatchdogInternal() {
         }
 
         if (checkForNCCLErrors(ncclComms)) {
-          LOG(INFO) << "Received NCCL errors for communicators in the cache";
-
+          LOG(WARNING) << "Received NCCL errors for communicators in the cache";
+	  
           if (blockingWait_) {
-            LOG(INFO) << "Aborting communicators that received errors";
+            LOG(WARNING) << "Aborting communicators that received errors";
             // We should not abort the communicators if we are performing a
             // non-blocking wait(). The reason for this is that if we abort the
             // nccl communicator, wait() might not throw exceptions and
@@ -370,7 +372,7 @@ void ProcessGroupNCCL::ncclCommWatchdogInternal() {
         abortedComms_.emplace(abortedCommId);
         const auto& storeKey = getNcclAbortedCommStoreKey(abortedCommId);
         store_->set(storeKey, {});
-        LOG(INFO) << "Watchdog wrote aborted communicator id to store: "
+        LOG(WARNING) << "Watchdog wrote aborted communicator id to store: "
                   << storeKey;
       }
 
@@ -384,7 +386,7 @@ void ProcessGroupNCCL::ncclCommWatchdogInternal() {
             store_->wait(
                 {storeKey},
                 std::chrono::milliseconds(kWaitForAbortCommStoreKey));
-            LOG(INFO) << "Found key in store: " << storeKey
+            LOG(WARNING) << "Found key in store: " << storeKey
                       << ", aborting appropriate communicators";
 
             // Now abort the appropriate communicators.
@@ -395,7 +397,7 @@ void ProcessGroupNCCL::ncclCommWatchdogInternal() {
               ncclComm->ncclCommAbort();
             }
             abortedComms_.emplace(commId);
-            LOG(INFO) << "Aborted communicators for key in store: " << storeKey;
+            LOG(WARNING) << "Aborted communicators for key in store: " << storeKey;
           } catch (std::exception& e) {
             VLOG(1) << "Did not find key in store: " << storeKey
                     << ", error: " << e.what();
@@ -630,7 +632,8 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::collective(
     Fn fn,
     PreProcess pre,
     PostProcess post) {
-    LOG(INFO) << "---------- PGNCCL: collective ------------";
+    LOG(WARNING) << "---------- PGNCCL: collective ------------";
+  
   const auto devices = getDeviceList(inputs);
   const auto key = getKeyFromDevices(devices);
   auto& ncclComms = getNCCLComm(key, devices);
@@ -703,7 +706,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::allreduce(
     std::vector<at::Tensor>& tensors,
     const AllreduceOptions& opts) {
   check_gpu_tensors(tensors);
-    LOG(INFO) << "---------- PGNCCL: allreduce ------------";
+    LOG(WARNING) << "---------- PGNCCL: allreduce ------------";
   return collective(
       tensors,
       tensors,
@@ -733,7 +736,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::broadcast(
     std::vector<at::Tensor>& tensors,
     const BroadcastOptions& opts) {
   check_gpu_tensors(tensors);
-  LOG(INFO) << "---------- PGNCCL: broadcast ------------";
+  LOG(WARNING) << "---------- PGNCCL: broadcast ------------";
   return collective(
       tensors,
       tensors,
@@ -756,7 +759,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::reduce(
     std::vector<at::Tensor>& tensors,
     const ReduceOptions& opts) {
   check_gpu_tensors(tensors);
-    LOG(INFO) << "---------- PGNCCL: reduce ------------";
+    LOG(WARNING) << "---------- PGNCCL: reduce ------------";
   return collective(
       tensors,
       tensors,
@@ -782,7 +785,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::allgather(
     std::vector<at::Tensor>& inputTensors,
     const AllgatherOptions& opts) {
   check_gpu_tensors(inputTensors);
-  LOG(INFO) << "---------- PGNCCL: allgather ------------";
+  LOG(WARNING) << "---------- PGNCCL: allgather ------------";
   auto outputFlattened =
       flatten_for_scatter_gather(outputTensors, inputTensors, size_);
   check_gpu_tensors(outputFlattened);
@@ -824,7 +827,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::allgather_coalesced(
     std::vector<std::vector<at::Tensor>>& /* unused */,
     std::vector<at::Tensor>& /* unused */,
     const AllgatherOptions& /* unused */) {
-    LOG(INFO) << "---------- PGNCCL: allgather_coalesced ------------";
+    LOG(WARNING) << "---------- PGNCCL: allgather_coalesced ------------";
   throw std::runtime_error(
       "ProcessGroupNCCL does not support allgather_coalesced");
 }
@@ -834,7 +837,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::reduce_scatter(
     std::vector<std::vector<at::Tensor>>& inputTensors,
     const ReduceScatterOptions& opts) {
   check_gpu_tensors(outputTensors);
-    LOG(INFO) << "---------- PGNCCL: reduce_scatter ------------";
+    LOG(WARNING) << "---------- PGNCCL: reduce_scatter ------------";
   auto inputFlattened =
       flatten_for_scatter_gather(inputTensors, outputTensors, size_);
   check_gpu_tensors(inputFlattened);
@@ -876,7 +879,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::reduce_scatter(
 std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::barrier(
     const BarrierOptions& opts) {
   std::vector<at::Device> devices;
-  LOG(INFO) << "---------- PGNCCL: barrier ------------";
+  LOG(WARNING) << "---------- PGNCCL: barrier ------------";
   if (usedDeviceIdxs_.empty()) {
     // This means there is not yet a NCCL collective being called
     // Here we have to use the best guesses and will use a single GPU to call

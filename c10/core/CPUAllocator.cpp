@@ -4,7 +4,7 @@
 // TODO: rename flags to C10
 C10_DEFINE_bool(
     caffe2_report_cpu_memory_usage,
-    false,
+    true,
     "If set, print out detailed memory usage");
 
 C10_DEFINE_bool(

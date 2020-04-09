@@ -507,6 +507,8 @@ ProcessGroupGloo::ProcessGroupGloo(
       store_(new GlooStore(store)),
       stop_(false),
       collectiveCounter_(0) {
+  LOG(WARNING) << "Gloo Process Group collectiveCounter " << collectiveCounter_;
+  std::cerr << "Gloo Process Group collectiveCounter " << collectiveCounter_;	    
   auto& devices = options.devices;
   if (devices.empty()) {
     throw std::runtime_error("No device(s) specified");

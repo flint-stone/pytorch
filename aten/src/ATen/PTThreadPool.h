@@ -13,7 +13,9 @@ public:
     : c10::ThreadPool(pool_size, numa_node_id, [](){
         c10::setThreadName("PTThreadPool");
         at::init_num_threads();
-      }) {}
+      }) {
+    	LOG(INFO) << "--------Creating PT ThreadPool!---------";
+    }
 };
 
 } // namespace at

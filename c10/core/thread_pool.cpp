@@ -12,7 +12,8 @@ ThreadPool::ThreadPool(
       available_(threads_.size()),
       total_(threads_.size()),
       numa_node_id_(numa_node_id) {
-  for (std::size_t i = 0; i < threads_.size(); ++i) {
+LOG(INFO) << "--------Creating c10 ThreadPool! : " << threads_.size(); 
+for (std::size_t i = 0; i < threads_.size(); ++i) {
     threads_[i] = std::thread([this, i, init_thread](){
       if (init_thread) {
         init_thread();
