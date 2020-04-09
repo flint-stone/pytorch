@@ -269,7 +269,7 @@ ProcessGroupNCCL::ProcessGroupNCCL(
       opTimeout_(opTimeout) {
   char* blockingWait = getenv(NCCL_BLOCKING_WAIT);
   LOG(WARNING) << "NCCL BLOCKING WAIT " << std::string(NCCL_BLOCKING_WAIT);
-  std::cerr << "NCCL BLOCKING WAIT " << std::string(NCCL_BLOCKING_WAIT);
+  std::cerr << "NCCL BLOCKING WAIT " << std::string(NCCL_BLOCKING_WAIT) << std::endl;
   try {
     if (blockingWait != nullptr) {
       auto val = std::stoi(blockingWait);
@@ -632,7 +632,9 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::collective(
     Fn fn,
     PreProcess pre,
     PostProcess post) {
-    LOG(WARNING) << "---------- PGNCCL: collective ------------";
+    LOG(WARNING) << "---------- PGNCCL: collective ------------"
+    std::cerr << "---------- PGNCCL: collective ------------" << std::endl;
+
   
   const auto devices = getDeviceList(inputs);
   const auto key = getKeyFromDevices(devices);
@@ -707,6 +709,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::allreduce(
     const AllreduceOptions& opts) {
   check_gpu_tensors(tensors);
     LOG(WARNING) << "---------- PGNCCL: allreduce ------------";
+    std::cerr << "---------- PGNCCL: allreduce ------------" << std::endl;
   return collective(
       tensors,
       tensors,
@@ -737,6 +740,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::broadcast(
     const BroadcastOptions& opts) {
   check_gpu_tensors(tensors);
   LOG(WARNING) << "---------- PGNCCL: broadcast ------------";
+  std::cerr << "---------- PGNCCL: broadcast ------------" << std::endl;
   return collective(
       tensors,
       tensors,
@@ -759,7 +763,8 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::reduce(
     std::vector<at::Tensor>& tensors,
     const ReduceOptions& opts) {
   check_gpu_tensors(tensors);
-    LOG(WARNING) << "---------- PGNCCL: reduce ------------";
+  LOG(WARNING) << "---------- PGNCCL: reduce ------------";
+  std::cerr << "---------- PGNCCL: reduce ------------" << std::endl;
   return collective(
       tensors,
       tensors,
@@ -786,6 +791,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::allgather(
     const AllgatherOptions& opts) {
   check_gpu_tensors(inputTensors);
   LOG(WARNING) << "---------- PGNCCL: allgather ------------";
+  std::cerr << "---------- PGNCCL: allgather ------------" << std::endl;
   auto outputFlattened =
       flatten_for_scatter_gather(outputTensors, inputTensors, size_);
   check_gpu_tensors(outputFlattened);
@@ -828,6 +834,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::allgather_coalesced(
     std::vector<at::Tensor>& /* unused */,
     const AllgatherOptions& /* unused */) {
     LOG(WARNING) << "---------- PGNCCL: allgather_coalesced ------------";
+    std::cerr << "---------- PGNCCL: allgather_coalesced ------------" << std::endl;
   throw std::runtime_error(
       "ProcessGroupNCCL does not support allgather_coalesced");
 }
@@ -838,6 +845,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::reduce_scatter(
     const ReduceScatterOptions& opts) {
   check_gpu_tensors(outputTensors);
     LOG(WARNING) << "---------- PGNCCL: reduce_scatter ------------";
+    std::cerr << "---------- PGNCCL: reduce_scatter ------------" << std::endl;
   auto inputFlattened =
       flatten_for_scatter_gather(inputTensors, outputTensors, size_);
   check_gpu_tensors(inputFlattened);
@@ -880,6 +888,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::barrier(
     const BarrierOptions& opts) {
   std::vector<at::Device> devices;
   LOG(WARNING) << "---------- PGNCCL: barrier ------------";
+  std::cerr << "---------- PGNCCL: barrier ------------" << std::endl;
   if (usedDeviceIdxs_.empty()) {
     // This means there is not yet a NCCL collective being called
     // Here we have to use the best guesses and will use a single GPU to call
