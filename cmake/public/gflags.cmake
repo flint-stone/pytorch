@@ -31,8 +31,8 @@ else()
   #  GFLAGS_LIBRARIES
   #  GFLAGS_LIBRARYRARY_DIRS
   include(FindPackageHandleStandardArgs)
-  set(GFLAGS_ROOT_DIR "" CACHE PATH "Folder contains Gflags")
-
+  set(GFLAGS_ROOT_DIR "/home/lexu1/my-envs/conda-env/include" CACHE PATH "Folder contains Gflags")
+  set(GFLAGS_LIBRARY "/home/lexu1/my-envs/conda-env/lib/" CACHE PATH "Folder root contains Google gflags")
   # We are testing only a couple of files in the include directories
   if(WIN32)
     find_path(GFLAGS_INCLUDE_DIR gflags/gflags.h
