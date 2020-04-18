@@ -632,7 +632,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::collective(
     Fn fn,
     PreProcess pre,
     PostProcess post) {
-    LOG(WARNING) << "---------- PGNCCL: collective ------------"
+    LOG(WARNING) << "---------- PGNCCL: collective ------------";
     std::cerr << "---------- PGNCCL: collective ------------" << std::endl;
 
   
