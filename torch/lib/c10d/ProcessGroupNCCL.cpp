@@ -631,7 +631,7 @@ std::shared_ptr<ProcessGroup::Work> ProcessGroupNCCL::collective(
     Fn fn,
     PreProcess pre,
     PostProcess post) {
-  LOG(WARNING) << "---------- PGNCCL: collective ------------"
+  LOG(WARNING) << "---------- PGNCCL: collective ------------";
   const auto devices = getDeviceList(inputs);
   const auto key = getKeyFromDevices(devices);
   auto& ncclComms = getNCCLComm(key, devices);
