@@ -4,6 +4,7 @@ import torch
 import torch.cuda.comm as comm
 from torch.autograd import Function
 from torch.cuda._utils import _get_device_index
+import inspect
 
 
 class Broadcast(Function):
@@ -20,11 +21,13 @@ class Broadcast(Function):
         ctx.input_device = inputs[0].get_device()
         outputs = comm.broadcast_coalesced(inputs, ctx.target_gpus)
         non_differentiables = []
-        warnings.warn('Broadcast forward ctx: ' + ctx +
-                      ' target_gpus ' + target_gpus
+        warnings.warn(str(inspect.currentframe().f_code.co_name) +
+                      ' Broadcast forward ctx: ' + str(ctx) +
+                      ' target_gpus ' + str(target_gpus)
                       )
         for idx, input_requires_grad in enumerate(ctx.needs_input_grad[1:]):
-            warnings.warn('Broadcast forward idx: ' + idx +
+            warnings.warn(str(inspect.currentframe().f_code.co_name) +
+                          ' Broadcast forward idx: ' + idx +
                           ' input_requires_grad ' + input_requires_grad
                           )
             if not input_requires_grad:
@@ -64,9 +67,10 @@ class Gather(Function):
         ctx.target_device = target_device
         ctx.dim = dim
         ctx.input_gpus = tuple(map(lambda i: i.get_device(), inputs))
-        warnings.warn('Gather forward ctx: ' + ctx +
+        warnings.warn(str(inspect.currentframe().f_code.co_name) +
+                      ' Gather forward ctx: ' + ctx +
                       ' target_device ' + target_device +
-                      ' dim ' + dim 
+                      ' dim ' + dim
                       )
         if all(t.dim() == 0 for t in inputs) and dim == 0:
             inputs = tuple(t.view(1) for t in inputs)
@@ -99,7 +103,8 @@ class Scatter(Function):
             # Perform CPU to GPU copies in a background stream
             streams = [_get_stream(device) for device in target_gpus]
         outputs = comm.scatter(input, target_gpus, chunk_sizes, ctx.dim, streams)
-        warnings.warn(' ' + input +
+        warnings.warn(str(inspect.currentframe().f_code.co_name) +
+                      ' Scatter forward: ' + input +
                       ' target_gpus '+ target_gpus
                       + ' chunk_sizes ' + chunk_sizes
                       + ' context ' + ctx
