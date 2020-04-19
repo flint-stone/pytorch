@@ -1,3 +1,5 @@
+import warnings
+
 import torch
 from . import nccl
 from torch._utils import _take_tensors, _flatten_dense_tensors, \
@@ -144,6 +146,11 @@ def scatter(tensor, devices, chunk_sizes=None, dim=0, streams=None):
         A tuple containing chunks of the ``tensor``, spread across given
         ``devices``.
     """
+    warnings.warn('comm.scatter tensor: ' + tensor+
+                  ' devices ' + devices
+                  + ' chunk sizes ' + chunk_sizes
+                  + ' dim ' + dim
+                  + ' streams ' + streams)
     return tuple(torch._C._scatter(tensor, devices, chunk_sizes, dim, streams))
 
 
@@ -162,4 +169,7 @@ def gather(tensors, dim=0, destination=None):
         A tensor located on ``destination`` device, that is a result of
         concatenating ``tensors`` along ``dim``.
     """
+    warnings.warn('comm.gather tensor: ' + tensors+
+                  + ' dim ' + dim
+                  + ' destination ' + destination)
     return torch._C._gather(tensors, dim, destination)

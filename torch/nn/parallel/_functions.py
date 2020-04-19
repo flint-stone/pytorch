@@ -20,10 +20,18 @@ class Broadcast(Function):
         ctx.input_device = inputs[0].get_device()
         outputs = comm.broadcast_coalesced(inputs, ctx.target_gpus)
         non_differentiables = []
+        warnings.warn('Broadcast forward ctx: ' + ctx +
+                      ' target_gpus ' + target_gpus
+                      )
         for idx, input_requires_grad in enumerate(ctx.needs_input_grad[1:]):
+            warnings.warn('Broadcast forward idx: ' + idx +
+                          ' input_requires_grad ' + input_requires_grad
+                          )
             if not input_requires_grad:
                 for output in outputs:
                     non_differentiables.append(output[idx])
+                    warnings.warn('Broadcast forward output: ' + output
+                                  )
         ctx.mark_non_differentiable(*non_differentiables)
         return tuple([t for tensors in outputs for t in tensors])
 
@@ -56,6 +64,10 @@ class Gather(Function):
         ctx.target_device = target_device
         ctx.dim = dim
         ctx.input_gpus = tuple(map(lambda i: i.get_device(), inputs))
+        warnings.warn('Gather forward ctx: ' + ctx +
+                      ' target_device ' + target_device +
+                      ' dim ' + dim 
+                      )
         if all(t.dim() == 0 for t in inputs) and dim == 0:
             inputs = tuple(t.view(1) for t in inputs)
             warnings.warn('Was asked to gather along dimension 0, but all '
@@ -87,6 +99,11 @@ class Scatter(Function):
             # Perform CPU to GPU copies in a background stream
             streams = [_get_stream(device) for device in target_gpus]
         outputs = comm.scatter(input, target_gpus, chunk_sizes, ctx.dim, streams)
+        warnings.warn(' ' + input +
+                      ' target_gpus '+ target_gpus
+                      + ' chunk_sizes ' + chunk_sizes
+                      + ' context ' + ctx
+                      + ' streams ' + streams)
         # Synchronize with the copy stream
         if streams is not None:
             for i, output in enumerate(outputs):

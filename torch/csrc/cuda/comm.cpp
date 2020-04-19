@@ -36,7 +36,6 @@ struct unique_type_checker {
 
 std::vector<Tensor> broadcast(const Tensor& tensor, IntArrayRef devices) {
   LOG(WARNING) << "---------- DDP: broadcast ------------";
-  std::cerr << "---------- DDP: broadcast ------------" << std::endl;
   if (tensor.is_cuda() && tensor.get_device() != devices[0])
     throw std::runtime_error("device of broadcasted tensor must appear as the "
                              "first on devices list");
@@ -104,7 +103,6 @@ std::vector<Tensor> broadcast(const Tensor& tensor, IntArrayRef devices) {
 // Variables.
 tensor_list2d broadcast_coalesced(TensorList tensors, IntArrayRef devices, size_t buffer_size) {
   LOG(WARNING) << "---------- DDP: broadcast_coalesced ------------";
-  std::cerr << "---------- DDP: broadcast_coalesced ------------" << std::endl;
   if (!std::all_of(tensors.begin(), tensors.end(),
                    [&](const at::Tensor& t) { return t.get_device() == devices[0]; })) {
     throw std::runtime_error("all tensors must be on devices[0]");
@@ -170,7 +168,6 @@ std::vector<at::Tensor> scatter(
     int64_t dim,
     const c10::optional<std::vector<c10::optional<at::cuda::CUDAStream>>>& streams) {
   LOG(WARNING) << "---------- DDP: scatter ------------";
-  std::cerr << "---------- DDP: scatter ------------" << std::endl;
   std::vector<at::Tensor> chunks;
   if (chunk_sizes) {
     const int64_t chunk_size_sum =
@@ -219,7 +216,6 @@ at::Tensor gather(
     int64_t dim,
     c10::optional<int32_t> destination_index) {
   LOG(WARNING) << "---------- DDP: gather ------------";
-  std::cerr << "---------- DDP: gather ------------" << std::endl;
   TORCH_CHECK(!tensors.empty(), "Expected at least one tensor to gather from");
   at::Tensor result;
   int64_t total_size = 0;
