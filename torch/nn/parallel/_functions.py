@@ -27,13 +27,14 @@ class Broadcast(Function):
                       )
         for idx, input_requires_grad in enumerate(ctx.needs_input_grad[1:]):
             warnings.warn(str(inspect.currentframe().f_code.co_name) +
-                          ' Broadcast forward idx: ' + idx +
-                          ' input_requires_grad ' + input_requires_grad
+                          ' Broadcast forward idx: ' + str(idx) +
+                          ' input_requires_grad ' + str(input_requires_grad)
                           )
             if not input_requires_grad:
                 for output in outputs:
                     non_differentiables.append(output[idx])
-                    warnings.warn('Broadcast forward output: ' + output
+                    warnings.warn(str(inspect.currentframe().f_code.co_name) +
+                                  ' Broadcast forward output: ' + str(output)
                                   )
         ctx.mark_non_differentiable(*non_differentiables)
         return tuple([t for tensors in outputs for t in tensors])
@@ -68,9 +69,9 @@ class Gather(Function):
         ctx.dim = dim
         ctx.input_gpus = tuple(map(lambda i: i.get_device(), inputs))
         warnings.warn(str(inspect.currentframe().f_code.co_name) +
-                      ' Gather forward ctx: ' + ctx +
-                      ' target_device ' + target_device +
-                      ' dim ' + dim
+                      ' Gather forward ctx: ' + str(ctx) +
+                      ' target_device ' + str(target_device) +
+                      ' dim ' + str(dim)
                       )
         if all(t.dim() == 0 for t in inputs) and dim == 0:
             inputs = tuple(t.view(1) for t in inputs)
@@ -104,11 +105,11 @@ class Scatter(Function):
             streams = [_get_stream(device) for device in target_gpus]
         outputs = comm.scatter(input, target_gpus, chunk_sizes, ctx.dim, streams)
         warnings.warn(str(inspect.currentframe().f_code.co_name) +
-                      ' Scatter forward: ' + input +
-                      ' target_gpus '+ target_gpus
-                      + ' chunk_sizes ' + chunk_sizes
-                      + ' context ' + ctx
-                      + ' streams ' + streams)
+                      ' Scatter forward: ' + str(input) +
+                      ' target_gpus '+ str(target_gpus)
+                      + ' chunk_sizes ' + str(chunk_sizes)
+                      + ' context ' + str(ctx)
+                      + ' streams ' + str(streams))
         # Synchronize with the copy stream
         if streams is not None:
             for i, output in enumerate(outputs):
