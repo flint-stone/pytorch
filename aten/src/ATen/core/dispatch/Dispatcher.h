@@ -216,6 +216,7 @@ template<class... Args> inline void unused_arg_(const Args&...) {}
 template<class Return, class... Args>
 inline Return Dispatcher::callUnboxedWithDispatchKey(const OperatorHandle& op, DispatchKey dispatchKey, Args... args) const {
   detail::unused_arg_(args...);  // workaround for a false-positive warning about unused parameters in gcc 5
+  LOG(WARNING) << "Dispatcher::callUnboxedWithDispatchKey " +  std::string(toString(dispatchKey))  ;
   const auto& dispatchTable = op.operatorIterator_->op.dispatch_table();
   const KernelFunction& kernel = dispatch_(dispatchTable, dispatchKey);
   return kernel.template callUnboxed<Return, Args...>(op, std::forward<Args>(args)...);
@@ -226,6 +227,7 @@ inline Return Dispatcher::callUnboxed(const OperatorHandle& op, Args... args) co
   detail::unused_arg_(args...);  // workaround for a false-positive warning about unused parameters in gcc 5
   const auto& dispatchTable = op.operatorIterator_->op.dispatch_table();
   auto dispatchKey = dispatchTable.dispatchKeyExtractor().getDispatchKeyUnboxed<Args...>(backendsWithoutFallthrough_, args...);
+  LOG(WARNING) << "Dispatcher::callUnboxed " +  std::string(toString(dispatchKey))  ;
   return callUnboxedWithDispatchKey<Return, Args...>(op, dispatchKey, args...);
 }
 
@@ -233,6 +235,7 @@ inline void Dispatcher::callBoxed(const OperatorHandle& op, Stack* stack) const 
   // note: this doesn't need the mutex because write operations on the list keep iterators intact.
   const auto& dispatchTable = op.operatorIterator_->op.dispatch_table();
   auto dispatchKey = dispatchTable.dispatchKeyExtractor().getDispatchKeyBoxed(backendsWithoutFallthrough_, stack);
+  LOG(WARNING) << "Dispatcher::callBoxed " +  std::string(toString(dispatchKey))  ;
   const KernelFunction& kernel = dispatch_(dispatchTable, dispatchKey);
   kernel.callBoxed(op, stack);
 }

@@ -21,6 +21,7 @@ inline std::vector<c10::IValue> callOp(
     const char* func_name,
     const char* overload_name,
     Args... args) {
+  LOG(WARNING) << "c10_util callOp " +  std::string(func_name) + " overload_name " + std::string(overload_name) ;
   const c10::optional<c10::OperatorHandle> op_handle =
       c10::Dispatcher::singleton().findSchema({func_name, overload_name});
   assert(op_handle.has_value());
