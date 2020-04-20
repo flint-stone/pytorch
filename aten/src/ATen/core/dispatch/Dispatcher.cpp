@@ -139,6 +139,7 @@ void Dispatcher::deregisterSchema_(const OperatorHandle& op, const OperatorName&
 
 RegistrationHandleRAII Dispatcher::registerBackendFallbackKernel(DispatchKey dispatchKey, KernelFunction kernel) {
   auto inserted = backendFallbackKernels_.setKernel(dispatchKey, std::move(kernel));
+  LOG(WARNING) << "Dispatcher::registerBackendFallbackKernel  dispatchKey " +  toString(dispatchKey) ;
   TORCH_CHECK(inserted == impl::KernelFunctionTable::SetKernelResult::ADDED_NEW_KERNEL, "Tried to register a backend fallback kernel for ", dispatchKey, " but there was already one registered.");
   if (kernel.isFallthrough()) {
     backendsWithoutFallthrough_ = backendsWithoutFallthrough_.remove(dispatchKey);
@@ -157,7 +158,9 @@ void Dispatcher::deregisterBackendFallbackKernel_(DispatchKey dispatchKey) {
 
 RegistrationHandleRAII Dispatcher::registerKernel(const OperatorHandle& op, c10::optional<DispatchKey> dispatch_key, KernelFunction kernel) {
   // note: this doesn't need the mutex to protect the iterator because write operations on the list keep iterators intact.
-  LOG(WARNING) << "Dispatcher::registerKernel  dispatch_key " +  toString(dispatch_key) ;
+  if(dispatch_key){
+      LOG(WARNING) << "Dispatcher::registerKernel  dispatch_key " +  toString(*dispatch_key) ;
+  }
   return op.operatorIterator_->op.registerKernel(dispatch_key, std::move(kernel));
 }
 
