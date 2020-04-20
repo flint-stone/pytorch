@@ -73,7 +73,7 @@ OperatorHandle Dispatcher::findOrRegisterSchema_(FunctionSchema&& schema) {
     if (found->schema() != schema) {
       TORCH_CHECK(false, "Tried to register multiple operators with the same name and the same overload name but different schemas: ", schema, " vs ", found->schema());
     }
-    LOG(WARNING) << "Dispatcher::findOrRegisterSchema_  found schema " + found->schema().name() + " <- " std::string(toString(schema));
+    LOG(WARNING) << "Dispatcher::findOrRegisterSchema_  found schema " + found->schema().name() + " <- "+ std::string(toString(schema));
     if (schema.isDefaultAliasAnalysisKind()) {
       // just do nothing and let it pass.
     } else if (found->schema().isDefaultAliasAnalysisKind()) {
