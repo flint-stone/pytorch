@@ -163,7 +163,6 @@ RegistrationHandleRAII Dispatcher::registerKernel(const OperatorHandle& op, c10:
 
 RegistrationHandleRAII Dispatcher::addRegistrationListener(std::unique_ptr<OpRegistrationListener> listener) {
   std::lock_guard<std::mutex> lock(mutex_);
-sAcD
   for (auto iter = operators_.begin(); iter != operators_.end(); ++iter) {
     listener->onOperatorRegistered(OperatorHandle(iter));
   }
