@@ -84,13 +84,19 @@ OperatorHandle Dispatcher::findOrRegisterSchema_(FunctionSchema&& schema) {
     }
     return *found;
   }
-
   OperatorName op_name = schema.operator_name();
   operators_.emplace_back(std::move(schema));
   OperatorHandle handle(--operators_.end());
   operatorLookupTable_.write([&] (ska::flat_hash_map<OperatorName, OperatorHandle>& operatorLookupTable) {
     operatorLookupTable.emplace(op_name, handle);
   });
+
+  LOG(WARNING) << "Dispatcher::findOrRegisterSchema_  found schema " +  found + " op_name " + schema.name() + " schema " + toString(schema) ;
+  schema.dump();
+  for (iter = keywords.begin(); iter != keywords.end(); iter++) {
+      if (iter != keywords.begin()) cout << ", ";
+      cout << *iter;
+  }
 
   return handle;
 }
@@ -156,12 +162,13 @@ void Dispatcher::deregisterBackendFallbackKernel_(DispatchKey dispatchKey) {
 
 RegistrationHandleRAII Dispatcher::registerKernel(const OperatorHandle& op, c10::optional<DispatchKey> dispatch_key, KernelFunction kernel) {
   // note: this doesn't need the mutex to protect the iterator because write operations on the list keep iterators intact.
+  LOG(WARNING) << "Dispatcher::registerKernel  dispatch_key " +  toString(dispatch_key) ;
   return op.operatorIterator_->op.registerKernel(dispatch_key, std::move(kernel));
 }
 
 RegistrationHandleRAII Dispatcher::addRegistrationListener(std::unique_ptr<OpRegistrationListener> listener) {
   std::lock_guard<std::mutex> lock(mutex_);
-
+sAcD
   for (auto iter = operators_.begin(); iter != operators_.end(); ++iter) {
     listener->onOperatorRegistered(OperatorHandle(iter));
   }
