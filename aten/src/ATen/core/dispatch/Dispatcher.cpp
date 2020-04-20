@@ -73,7 +73,7 @@ OperatorHandle Dispatcher::findOrRegisterSchema_(FunctionSchema&& schema) {
     if (found->schema() != schema) {
       TORCH_CHECK(false, "Tried to register multiple operators with the same name and the same overload name but different schemas: ", schema, " vs ", found->schema());
     }
-    LOG(WARNING) << "Dispatcher::findOrRegisterSchema_  found schema " + found->schema().name() + " <- " toString(schema);
+    LOG(WARNING) << "Dispatcher::findOrRegisterSchema_  found schema " + found->schema().name() + " <- " std::string(toString(schema));
     if (schema.isDefaultAliasAnalysisKind()) {
       // just do nothing and let it pass.
     } else if (found->schema().isDefaultAliasAnalysisKind()) {
@@ -141,7 +141,7 @@ void Dispatcher::deregisterSchema_(const OperatorHandle& op, const OperatorName&
 
 RegistrationHandleRAII Dispatcher::registerBackendFallbackKernel(DispatchKey dispatchKey, KernelFunction kernel) {
   auto inserted = backendFallbackKernels_.setKernel(dispatchKey, std::move(kernel));
-  LOG(WARNING) << "Dispatcher::registerBackendFallbackKernel  dispatchKey " +  toString(dispatchKey) ;
+  LOG(WARNING) << "Dispatcher::registerBackendFallbackKernel  dispatchKey " +  std::string(toString(dispatchKey)) ;
   TORCH_CHECK(inserted == impl::KernelFunctionTable::SetKernelResult::ADDED_NEW_KERNEL, "Tried to register a backend fallback kernel for ", dispatchKey, " but there was already one registered.");
   if (kernel.isFallthrough()) {
     backendsWithoutFallthrough_ = backendsWithoutFallthrough_.remove(dispatchKey);
@@ -161,7 +161,7 @@ void Dispatcher::deregisterBackendFallbackKernel_(DispatchKey dispatchKey) {
 RegistrationHandleRAII Dispatcher::registerKernel(const OperatorHandle& op, c10::optional<DispatchKey> dispatch_key, KernelFunction kernel) {
   // note: this doesn't need the mutex to protect the iterator because write operations on the list keep iterators intact.
   if(dispatch_key){
-      LOG(WARNING) << "Dispatcher::registerKernel  dispatch_key " +  toString(*dispatch_key) ;
+      LOG(WARNING) << "Dispatcher::registerKernel  dispatch_key " +  std::string(toString(*dispatch_key)) ;
   }
   return op.operatorIterator_->op.registerKernel(dispatch_key, std::move(kernel));
 }
