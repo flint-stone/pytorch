@@ -63,6 +63,7 @@ c10::optional<OperatorHandle> Dispatcher::findSchema(const OperatorName& overloa
 }
 
 OperatorHandle Dispatcher::findSchemaOrThrow(const char* name, const char* overload_name) {
+  LOG(WARNING) << "Dispatcher::findSchemaOrThrow name " + std::string(name) + " overload_name " + std::string(overload_name);
   return findSchema({name, overload_name}).value();
 }
 
@@ -72,6 +73,7 @@ OperatorHandle Dispatcher::findOrRegisterSchema_(FunctionSchema&& schema) {
     if (found->schema() != schema) {
       TORCH_CHECK(false, "Tried to register multiple operators with the same name and the same overload name but different schemas: ", schema, " vs ", found->schema());
     }
+    LOG(WARNING) << "Dispatcher::findOrRegisterSchema_  found schema " + found->schema().name() + " <- " toString(schema);
     if (schema.isDefaultAliasAnalysisKind()) {
       // just do nothing and let it pass.
     } else if (found->schema().isDefaultAliasAnalysisKind()) {
@@ -91,7 +93,7 @@ OperatorHandle Dispatcher::findOrRegisterSchema_(FunctionSchema&& schema) {
     operatorLookupTable.emplace(op_name, handle);
   });
 
-  LOG(WARNING) << "Dispatcher::findOrRegisterSchema_  found schema " +  found + " op_name " + schema.name() + " schema " + toString(schema) ;
+  LOG(WARNING) << "Dispatcher::findOrRegisterSchema_  not found schema " + schema.name() + " schema " + toString(schema) ;
   schema.dump();
   return handle;
 }
