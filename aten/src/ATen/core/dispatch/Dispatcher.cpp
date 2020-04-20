@@ -93,11 +93,6 @@ OperatorHandle Dispatcher::findOrRegisterSchema_(FunctionSchema&& schema) {
 
   LOG(WARNING) << "Dispatcher::findOrRegisterSchema_  found schema " +  found + " op_name " + schema.name() + " schema " + toString(schema) ;
   schema.dump();
-  for (iter = keywords.begin(); iter != keywords.end(); iter++) {
-      if (iter != keywords.begin()) cout << ", ";
-      cout << *iter;
-  }
-
   return handle;
 }
 
