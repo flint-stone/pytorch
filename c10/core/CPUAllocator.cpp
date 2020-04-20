@@ -92,7 +92,7 @@ void free_cpu(void* data) {
 #else
   free(data);
 #endif
-}
+}cci
 
 // A virtual struct that is used to report C10's memory allocation and
 // deallocation status

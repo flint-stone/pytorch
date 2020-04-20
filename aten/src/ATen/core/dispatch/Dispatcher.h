@@ -239,7 +239,7 @@ inline void Dispatcher::callBoxed(const OperatorHandle& op, Stack* stack) const 
 
 inline const KernelFunction& Dispatcher::dispatch_(const DispatchTable& dispatchTable, DispatchKey dispatchKey) const {
   const KernelFunction* backendKernel = dispatchTable.lookup(dispatchKey);
-
+  LOG(WARNING) << "Dispatcher::dispatch_ " +  std::string(toString(dispatchKey))  ;
   if (nullptr != backendKernel) {
     return *backendKernel;
   }
