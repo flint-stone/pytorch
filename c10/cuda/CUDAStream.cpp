@@ -2,6 +2,7 @@
 #include <c10/cuda/CUDAFunctions.h>
 #include <c10/cuda/CUDAGuard.h>
 #include <c10/util/Exception.h>
+#include <ATen/ATen.h>
 
 #include <array>
 #include <atomic>
@@ -335,7 +336,7 @@ CUDAStream getStreamFromPool(
   // Initializes the stream pools (once)
   std::call_once(
       device_flags[device_index], initDeviceStreamState, device_index);
-  LOG(WARNING) << "getStreamFromPool  isHighPriority " +  std::string(isHighPriority) << " device_index " << device_index;
+  LOG(WARNING) << "getStreamFromPool  isHighPriority " <<  isHighPriority << " device_index " << device_index;
   if (isHighPriority) {
     const auto idx = get_idx(high_priority_counters[device_index]);
     return CUDAStream_fromInternals(&high_priority_streams[device_index][idx]);

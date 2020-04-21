@@ -10,7 +10,7 @@
 #include <c10/core/DeviceGuard.h>
 #include <c10/util/Exception.h>
 #include <c10/core/Stream.h>
-
+#include <c10/util/Logging.h>
 /*
 * Stream pool note.
 *
