@@ -12,6 +12,8 @@
 
 #include <iostream>
 
+#include <execinfo.h>
+
 namespace c10 {
 namespace cuda {
 
@@ -358,6 +360,17 @@ CUDAStream getDefaultCUDAStream(DeviceIndex device_index) {
 CUDAStream getCurrentCUDAStream(DeviceIndex device_index) {
   initCUDAStreamsOnce();
   LOG(WARNING) << "getCurrentCUDAStream device_index " +  device_index;
+  int j, nptrs;
+  void *buffer[200];
+  char **strings;
+  nptrs = backtrace(buffer, BT_BUF_SIZE);
+  //printf("backtrace() returned %d addresses\n", nptrs);
+  strings = backtrace_symbols(buffer, nptrs);
+  if (strings != NULL) {
+      for (j = 0; j < nptrs; j++){
+          LOG(WARNING) << "print trace: " <<  std::string(strings[j]);
+      }
+  }
   if (device_index == -1) {
     device_index = current_device();
   }
