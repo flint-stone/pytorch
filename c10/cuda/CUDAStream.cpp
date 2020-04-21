@@ -335,7 +335,7 @@ CUDAStream getStreamFromPool(
   // Initializes the stream pools (once)
   std::call_once(
       device_flags[device_index], initDeviceStreamState, device_index);
-
+  LOG(WARNING) << "getStreamFromPool  isHighPriority " +  std::string(isHighPriority) << " device_index " << device_index;
   if (isHighPriority) {
     const auto idx = get_idx(high_priority_counters[device_index]);
     return CUDAStream_fromInternals(&high_priority_streams[device_index][idx]);
@@ -347,6 +347,7 @@ CUDAStream getStreamFromPool(
 
 CUDAStream getDefaultCUDAStream(DeviceIndex device_index) {
   initCUDAStreamsOnce();
+  LOG(WARNING) << "getDefaultCUDAStream device_index " +  device_index ;
   if (device_index == -1) {
     device_index = current_device();
   }
@@ -355,6 +356,7 @@ CUDAStream getDefaultCUDAStream(DeviceIndex device_index) {
 }
 CUDAStream getCurrentCUDAStream(DeviceIndex device_index) {
   initCUDAStreamsOnce();
+  LOG(WARNING) << "getCurrentCUDAStream device_index " +  device_index;
   if (device_index == -1) {
     device_index = current_device();
   }
@@ -367,6 +369,7 @@ void setCurrentCUDAStream(CUDAStream stream) {
   auto ptr = CUDAStream_internals(stream);
   AT_ASSERT(ptr);
   current_streams[ptr->device_index] = ptr;
+  LOG(WARNING) << "setCurrentCUDAStream ptr->device_index" +  ptr->device_index;
 }
 
 std::ostream& operator<<(std::ostream& stream, const CUDAStream& s) {
