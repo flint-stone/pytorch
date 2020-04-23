@@ -1,7 +1,7 @@
 #pragma once
 
 #include <c10/core/Device.h>
-
+#include <c10/util/Logging.h>
 namespace c10 {
 
 /// An index representing a specific stream.  A StreamId is not independently
