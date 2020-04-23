@@ -4,6 +4,7 @@
 #include <utility>
 
 #include <cuda_runtime_api.h>
+#include <cuda_runtime.h>
 
 #include <c10/cuda/CUDAException.h>
 #include <c10/cuda/CUDAMacros.h>
@@ -69,7 +70,15 @@ public:
   /// Construct a CUDAStream from a Stream.  This construction is checked,
   /// and will raise an error if the Stream is not, in fact, a CUDA stream.
   explicit CUDAStream(Stream stream) : stream_(stream) {
-    LOG(WARNING) << "create CUDAStream from stream" << stream_.device_index() << " device type " << stream_.device_type(); 
+    LOG(WARNING) << "create CUDAStream from stream" << stream_.device_index() << " device type " << stream_.device_type();
+	CUresult result;
+    CUContext cuContext;
+	result = cuCtxGetCurrent(&cuContext);
+	if (result == CUDA_SUCCESS){
+		result = cuCtxPopCurrent(&cuContext);
+		LOG(WARNING) << "pop context current " << cuContext;
+	}
+
     TORCH_CHECK(stream_.device_type() == DeviceType::CUDA);
   }
 
@@ -78,6 +87,13 @@ public:
   /// be invoked as: CUDAStream(CUDAStream::UNCHECKED, stream)
   explicit CUDAStream(Unchecked, Stream stream) : stream_(stream) {
   LOG(WARNING) << "create CUDAStream";
+  CUresult result;
+  CUContext cuContext;
+  result = cuCtxGetCurrent(&cuContext);
+  if (result == CUDA_SUCCESS){
+  	result = cuCtxPopCurrent(&cuContext);
+  	LOG(WARNING) << "pop context current " << cuContext;
+  }
 }
 
   bool operator==(const CUDAStream& other) const noexcept {
