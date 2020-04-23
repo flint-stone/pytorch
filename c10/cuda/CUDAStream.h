@@ -11,6 +11,7 @@
 #include <c10/util/Exception.h>
 #include <c10/core/Stream.h>
 #include <c10/util/Logging.h>
+#include <ATen/ATen.h>
 /*
 * Stream pool note.
 *
@@ -68,13 +69,16 @@ public:
   /// Construct a CUDAStream from a Stream.  This construction is checked,
   /// and will raise an error if the Stream is not, in fact, a CUDA stream.
   explicit CUDAStream(Stream stream) : stream_(stream) {
+    LOG(WARNING) << "create CUDAStream from stream" << stream_.device_index() << " device type " << stream_.device_type(); 
     TORCH_CHECK(stream_.device_type() == DeviceType::CUDA);
   }
 
   /// Construct a CUDAStream from a Stream with no error checking.
   /// This constructor uses the "named" constructor idiom, and can
   /// be invoked as: CUDAStream(CUDAStream::UNCHECKED, stream)
-  explicit CUDAStream(Unchecked, Stream stream) : stream_(stream) {}
+  explicit CUDAStream(Unchecked, Stream stream) : stream_(stream) {
+  LOG(WARNING) << "create CUDAStream";
+}
 
   bool operator==(const CUDAStream& other) const noexcept {
     return unwrap() == other.unwrap();

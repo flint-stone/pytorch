@@ -70,7 +70,9 @@ public:
   /// StreamIds; they are welcome to allocate in whatever way they like.
   explicit Stream(Unsafe, Device device, StreamId id)
     : device_(device)
-    , id_(id) {}
+    , id_(id) {
+  LOG(WARNING) << "create CUDAStream from stream" << id << " device type " << device;  	
+  }
 
   /// Construct the default stream of a Device.  The default stream is
   /// NOT the same as the current stream; default stream is a fixed stream
@@ -78,7 +80,9 @@ public:
   /// StreamGuard.
   explicit Stream(Default, Device device)
     : device_(device)
-    , id_(0) {}
+    , id_(0) {
+  LOG(WARNING) << "create CUDAStream device type " << device; 
+  }
 
   bool operator==(const Stream& other) const noexcept {
     return this->device_ == other.device_ && this->id_ == other.id_;

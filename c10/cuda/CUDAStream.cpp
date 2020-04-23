@@ -363,7 +363,7 @@ CUDAStream getCurrentCUDAStream(DeviceIndex device_index) {
   int j, nptrs;
   void *buffer[200];
   char **strings;
-  nptrs = backtrace(buffer, BT_BUF_SIZE);
+  nptrs = backtrace(buffer, 200);
   //printf("backtrace() returned %d addresses\n", nptrs);
   strings = backtrace_symbols(buffer, nptrs);
   if (strings != NULL) {
