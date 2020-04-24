@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <utility>
 
+#include <cuda.h>
 #include <cuda_runtime_api.h>
 #include <cuda_runtime.h>
 
@@ -12,7 +13,7 @@
 #include <c10/util/Exception.h>
 #include <c10/core/Stream.h>
 #include <c10/util/Logging.h>
-#include <ATen/ATen.h>
+//#include <ATen/ATen.h>
 /*
 * Stream pool note.
 *

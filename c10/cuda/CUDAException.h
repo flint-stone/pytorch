@@ -33,7 +33,7 @@
 
 static printCurrentContext(){
 	CUresult result;
-	CUContext cuContext;
+	CUcontext cuContext;
 	result = cuCtxGetCurrent(&cuContext);
 	if (result == CUDA_SUCCESS){
 		result = cuCtxPopCurrent(&cuContext);
