@@ -1,7 +1,7 @@
 #pragma once
 
 #include <c10/cuda/CUDAMacros.h>
-
+#include <cuda.h>
 namespace c10 {
 namespace cuda {
 namespace impl {
