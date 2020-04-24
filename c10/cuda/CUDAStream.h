@@ -71,14 +71,7 @@ public:
   /// and will raise an error if the Stream is not, in fact, a CUDA stream.
   explicit CUDAStream(Stream stream) : stream_(stream) {
     LOG(WARNING) << "create CUDAStream from stream" << stream_.device_index() << " device type " << stream_.device_type();
-	CUresult result;
-    CUContext cuContext;
-	result = cuCtxGetCurrent(&cuContext);
-	if (result == CUDA_SUCCESS){
-		result = cuCtxPopCurrent(&cuContext);
-		LOG(WARNING) << "pop context current " << cuContext;
-	}
-
+	printCurrentContext();
     TORCH_CHECK(stream_.device_type() == DeviceType::CUDA);
   }
 
@@ -87,13 +80,7 @@ public:
   /// be invoked as: CUDAStream(CUDAStream::UNCHECKED, stream)
   explicit CUDAStream(Unchecked, Stream stream) : stream_(stream) {
   LOG(WARNING) << "create CUDAStream";
-  CUresult result;
-  CUContext cuContext;
-  result = cuCtxGetCurrent(&cuContext);
-  if (result == CUDA_SUCCESS){
-  	result = cuCtxPopCurrent(&cuContext);
-  	LOG(WARNING) << "pop context current " << cuContext;
-  }
+  printCurrentContext();
 }
 
   bool operator==(const CUDAStream& other) const noexcept {
