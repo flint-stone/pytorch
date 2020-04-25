@@ -39,7 +39,17 @@ namespace at {
 namespace cuda {
 namespace detail {
 
-// NB: deleter is dynamic, because we need it to live in a separate
+inline void printCurrentContext(){
+	AT_CUDA_DRIVER_CHECK(CUDAHooks::nvrtc().cuDevicePrimaryCtxGetState(device_index, &ctx_flags, &ctx_is_active));
+	CUcontext cuContext;
+	if (AT_CUDA_DRIVER_CHECK(CUDAHooks::nvrtc().cuCtxGetCurrent(&cuContext))){
+		AT_CUDA_DRIVER_CHECK(CUDAHooks::nvrtc().cuCtxPopCurrent(&cuContext));
+		LOG(WARNING) << "pop context current " << cuContext;
+	}
+}
+
+
+	// NB: deleter is dynamic, because we need it to live in a separate
 // compilation unit (alt is to have another method in hooks, but
 // let's not if we don't need to!)
 std::unique_ptr<THCState, void (*)(THCState*)> CUDAHooks::initCUDA() const {

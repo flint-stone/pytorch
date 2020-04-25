@@ -46,7 +46,9 @@ namespace at { namespace cuda {
   _(cuLaunchKernel)                              \
   _(cuCtxGetCurrent)                             \
   _(cuModuleUnload)                              \
-  _(cuDevicePrimaryCtxGetState)
+  _(cuDevicePrimaryCtxGetState)					\
+  _(cuCtxPopCurrent)							\
+  _(cuCtxGetCurrent)
 
 #else
 
@@ -79,7 +81,9 @@ namespace at { namespace cuda {
   _(nvrtcCompileProgram)                         \
   _(cuCtxGetCurrent)                             \
   _(cuModuleUnload)                              \
-  _(cuDevicePrimaryCtxGetState)
+  _(cuDevicePrimaryCtxGetState)					\
+  _(cuCtxPopCurrent)							\
+  _(cuCtxGetCurrent)
 
 #endif
 
