@@ -8,6 +8,7 @@
 // The naming convention used here matches the naming convention of torch.cuda
 
 #include <cuda_runtime_api.h>
+#include <cuda.h>
 
 #include <c10/macros/Macros.h>
 #include <c10/core/Device.h>
@@ -43,6 +44,16 @@ inline DeviceIndex current_device() {
 
 inline void set_device(DeviceIndex device) {
   C10_CUDA_CHECK(cudaSetDevice(static_cast<int>(device)));
+}
+
+inline void printCurrentContext(){
+	CUresult result;
+	CUcontext cuContext;
+	result = cuCtxGetCurrent(&cuContext);
+	if (result == CUDA_SUCCESS){
+		result = cuCtxPopCurrent(&cuContext);
+		LOG(WARNING) << "pop context current " << cuContext;
+	}
 }
 
 }} // namespace c10::cuda

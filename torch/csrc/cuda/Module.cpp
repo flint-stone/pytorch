@@ -57,6 +57,7 @@ static void poison_fork() {
 void THCPModule_setDevice(int device)
 {
   THCudaCheck(cudaSetDevice(device));
+  c10::cuda::printCurrentContext();
 }
 
 PyObject * THCPModule_setDevice_wrap(PyObject *self, PyObject *arg)
@@ -67,6 +68,7 @@ PyObject * THCPModule_setDevice_wrap(PyObject *self, PyObject *arg)
 
   torch::utils::cuda_lazy_init();
   THCPModule_setDevice(device);
+  c10::cuda::printCurrentContext();
 
   Py_RETURN_NONE;
   END_HANDLE_TH_ERRORS

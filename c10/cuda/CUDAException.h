@@ -3,7 +3,6 @@
 #include <c10/util/Exception.h>
 #include <c10/macros/Macros.h>
 #include <c10/util/Logging.h>
-#include <cuda.h>
 
 // Note [CHECK macro]
 // ~~~~~~~~~~~~~~~~~~
@@ -31,12 +30,3 @@
     }                                                          \
   } while (0)
 
-static printCurrentContext(){
-	CUresult result;
-	CUcontext cuContext;
-	result = cuCtxGetCurrent(&cuContext);
-	if (result == CUDA_SUCCESS){
-		result = cuCtxPopCurrent(&cuContext);
-		LOG(WARNING) << "pop context current " << cuContext;
-	}
-}
