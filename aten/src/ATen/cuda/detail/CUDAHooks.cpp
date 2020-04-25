@@ -65,7 +65,7 @@ std::unique_ptr<THCState, void (*)(THCState*)> CUDAHooks::initCUDA() const {
 #ifdef USE_MAGMA
   THCMagma_init(thc_state);
 #endif
-  printCurrentContext();
+  //printCurrentContext();
   return std::unique_ptr<THCState, void (*)(THCState*)>(
       thc_state, [](THCState* p) {
         if (p)
@@ -161,7 +161,7 @@ const at::cuda::NVRTC& CUDAHooks::nvrtc() const {
 int64_t CUDAHooks::current_device() const {
   int device;
   cudaError_t err = cudaGetDevice(&device);
-  CUDAHooks::printCurrentContext();
+  //CUDAHooks::printCurrentContext();
   if (err == cudaSuccess) {
     return device;
   }
@@ -195,7 +195,7 @@ c10::optional<int64_t> CUDAHooks::getDevceIndexWithPrimaryContext() const {
 }
 
 Allocator* CUDAHooks::getPinnedMemoryAllocator() const {
-  CUDAHooks::printCurrentContext();
+  //CUDAHooks::printCurrentContext();
   return at::cuda::getPinnedMemoryAllocator();
 }
 

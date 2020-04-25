@@ -71,7 +71,7 @@ public:
   explicit Stream(Unsafe, Device device, StreamId id)
     : device_(device)
     , id_(id) {
-  LOG(WARNING) << "create CUDAStream from stream" << id << " device type " << device;  	
+  LOG(WARNING) << "create CUDAStream from stream " << id << " device type " << device;
   }
 
   /// Construct the default stream of a Device.  The default stream is

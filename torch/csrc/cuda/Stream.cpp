@@ -9,9 +9,12 @@
 #include <structmember.h>
 #include <cuda_runtime_api.h>
 
+#include <ATen/ATen.h>
+
 PyObject *THCPStreamClass = nullptr;
 
-static PyObject * THCPStream_pynew(
+static PyObject *
+(
   PyTypeObject *type, PyObject *args, PyObject *kwargs) {
   HANDLE_TH_ERRORS
 
@@ -168,6 +171,7 @@ PyTypeObject THCPStreamType = {
 
 void THCPStream_init(PyObject *module)
 {
+  LOG(WARNING) << "THCPStream_init " << module;
   THCPStreamClass = (PyObject*)&THCPStreamType;
   if (PyType_Ready(&THCPStreamType) < 0) {
     throw python_error();

@@ -147,12 +147,12 @@ def scatter(tensor, devices, chunk_sizes=None, dim=0, streams=None):
         A tuple containing chunks of the ``tensor``, spread across given
         ``devices``.
     """
-    warnings.warn(str(inspect.currentframe().f_code.co_name) +
-                    ' comm.scatter tensor: ' + str(tensor)+
-                  ' devices ' + str(devices)
-                  + ' chunk sizes ' + str(chunk_sizes)
-                  + ' dim ' + str(dim)
-                  + ' streams ' + str(streams))
+    # warnings.warn(str(inspect.currentframe().f_code.co_name) +
+    #                 ' comm.scatter tensor: ' + str(tensor)+
+    #               ' devices ' + str(devices)
+    #               + ' chunk sizes ' + str(chunk_sizes)
+    #               + ' dim ' + str(dim)
+    #               + ' streams ' + str(streams))
     return tuple(torch._C._scatter(tensor, devices, chunk_sizes, dim, streams))
 
 
@@ -171,8 +171,8 @@ def gather(tensors, dim=0, destination=None):
         A tensor located on ``destination`` device, that is a result of
         concatenating ``tensors`` along ``dim``.
     """
-    warnings.warn(str(inspect.currentframe().f_code.co_name) +
-                  ' comm.gather tensor: ' + str(tensors)+
-                  + ' dim ' + str(dim)
-                  + ' destination ' + str(destination))
+    # warnings.warn(str(inspect.currentframe().f_code.co_name) +
+    #               ' comm.gather tensor: ' + str(tensors)+
+    #               + ' dim ' + str(dim)
+    #               + ' destination ' + str(destination))
     return torch._C._gather(tensors, dim, destination)
