@@ -2,7 +2,6 @@
 #include <c10/cuda/CUDAFunctions.h>
 #include <c10/cuda/CUDAGuard.h>
 #include <c10/util/Exception.h>
-//#include <ATen/ATen.h>
 
 #include <array>
 #include <atomic>
@@ -212,6 +211,7 @@ static void initGlobalStreamState() {
 
   // Initializes default streams
   for (auto i = decltype(num_gpus){0}; i < num_gpus; ++i) {
+  	LOG(WARNING) << "initGlobalStreamState device idx " << device_index << " i " << i;
     default_streams[i].device_index = i;
     low_priority_counters[i] = 0;
     high_priority_counters[i] = 0;
@@ -282,6 +282,7 @@ LeakyStreamInternals* CUDAStream_internals(CUDAStream s) {
   size_t si = streamIdIndex(s.unwrap().id());
   switch (st) {
     case StreamIdType::DEFAULT:
+    	LOG(WARNING)<< " CUDAStream_internals DEFAULT ";
       AT_ASSERTM(
           si == 0,
           "Unrecognized stream ",
@@ -293,8 +294,10 @@ LeakyStreamInternals* CUDAStream_internals(CUDAStream s) {
           " official API like c10::cuda::getStreamFromPool() to get a new stream.");
       return &default_streams[device_index];
     case StreamIdType::LOW:
+		LOG(WARNING)<< " CUDAStream_internals LOW " << si;
       return &low_priority_streams[device_index][si];
     case StreamIdType::HIGH:
+		LOG(WARNING)<< " CUDAStream_internals LOW " << si;
       return &high_priority_streams[device_index][si];
     default:
       AT_ASSERTM(
@@ -350,7 +353,7 @@ CUDAStream getStreamFromPool(
 
 CUDAStream getDefaultCUDAStream(DeviceIndex device_index) {
   initCUDAStreamsOnce();
-  LOG(WARNING) << "getDefaultCUDAStream device_index " +  device_index ;
+  LOG(WARNING) << "getDefaultCUDAStream device_index " <<  device_index ;
   if (device_index == -1) {
     device_index = current_device();
   }
@@ -359,7 +362,7 @@ CUDAStream getDefaultCUDAStream(DeviceIndex device_index) {
 }
 CUDAStream getCurrentCUDAStream(DeviceIndex device_index) {
   initCUDAStreamsOnce();
-  LOG(WARNING) << "getCurrentCUDAStream device_index " +  device_index;
+  LOG(WARNING) << "getCurrentCUDAStream device_index " <<  device_index;
   int j, nptrs;
   void *buffer[200];
   char **strings;
