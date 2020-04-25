@@ -211,7 +211,7 @@ static void initGlobalStreamState() {
 
   // Initializes default streams
   for (auto i = decltype(num_gpus){0}; i < num_gpus; ++i) {
-  	LOG(WARNING) << "initGlobalStreamState device idx " << device_index << " i " << i;
+  	LOG(WARNING) << "initGlobalStreamState device idx " << i << " num_gpus " << num_gpus;
     default_streams[i].device_index = i;
     low_priority_counters[i] = 0;
     high_priority_counters[i] = 0;
@@ -368,12 +368,12 @@ CUDAStream getCurrentCUDAStream(DeviceIndex device_index) {
   char **strings;
   nptrs = backtrace(buffer, 200);
   //printf("backtrace() returned %d addresses\n", nptrs);
-  strings = backtrace_symbols(buffer, nptrs);
+  /*strings = backtrace_symbols(buffer, nptrs);
   if (strings != NULL) {
       for (j = 0; j < nptrs; j++){
           LOG(WARNING) << "print trace: " <<  std::string(strings[j]);
       }
-  }
+  }*/
   if (device_index == -1) {
     device_index = current_device();
   }
