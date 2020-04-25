@@ -48,7 +48,6 @@ namespace at { namespace cuda {
   _(cuModuleUnload)                              \
   _(cuDevicePrimaryCtxGetState)					\
   _(cuCtxPopCurrent)							\
-  _(cuCtxGetCurrent)
 
 #else
 
@@ -83,7 +82,6 @@ namespace at { namespace cuda {
   _(cuModuleUnload)                              \
   _(cuDevicePrimaryCtxGetState)					\
   _(cuCtxPopCurrent)							\
-  _(cuCtxGetCurrent)
 
 #endif
 

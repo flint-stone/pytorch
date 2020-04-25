@@ -39,13 +39,18 @@ namespace at {
 namespace cuda {
 namespace detail {
 
-inline void printCurrentContext(){
-	AT_CUDA_DRIVER_CHECK(CUDAHooks::nvrtc().cuDevicePrimaryCtxGetState(device_index, &ctx_flags, &ctx_is_active));
+void CUDAHooks::printCurrentContext() const {
+	//AT_CUDA_DRIVER_CHECK(CUDAHooks::nvrtc().cuDevicePrimaryCtxGetState(device_index, &ctx_flags, &ctx_is_active));
 	CUcontext cuContext;
-	if (AT_CUDA_DRIVER_CHECK(CUDAHooks::nvrtc().cuCtxGetCurrent(&cuContext))){
-		AT_CUDA_DRIVER_CHECK(CUDAHooks::nvrtc().cuCtxPopCurrent(&cuContext));
-		LOG(WARNING) << "pop context current " << cuContext;
-	}
+	AT_CUDA_DRIVER_CHECK(CUDAHooks::nvrtc().cuCtxGetCurrent(&cuContext));
+	LOG(WARNING) << "cuCtxGetCurrent " << cuContext;
+	AT_CUDA_DRIVER_CHECK(CUDAHooks::nvrtc().cuCtxPopCurrent(&cuContext));
+	LOG(WARNING) << "cuCtxPopCurrent " << cuContext;
+	
+	//if (AT_CUDA_DRIVER_CHECK(CUDAHooks::nvrtc().cuCtxGetCurrent(&cuContext))){
+	//	AT_CUDA_DRIVER_CHECK(CUDAHooks::nvrtc().cuCtxPopCurrent(&cuContext));
+	//	LOG(WARNING) << "pop context current " << cuContext;
+	//}
 }
 
 
@@ -60,6 +65,7 @@ std::unique_ptr<THCState, void (*)(THCState*)> CUDAHooks::initCUDA() const {
 #ifdef USE_MAGMA
   THCMagma_init(thc_state);
 #endif
+  printCurrentContext();
   return std::unique_ptr<THCState, void (*)(THCState*)>(
       thc_state, [](THCState* p) {
         if (p)
@@ -155,6 +161,7 @@ const at::cuda::NVRTC& CUDAHooks::nvrtc() const {
 int64_t CUDAHooks::current_device() const {
   int device;
   cudaError_t err = cudaGetDevice(&device);
+  CUDAHooks::printCurrentContext();
   if (err == cudaSuccess) {
     return device;
   }
@@ -188,6 +195,7 @@ c10::optional<int64_t> CUDAHooks::getDevceIndexWithPrimaryContext() const {
 }
 
 Allocator* CUDAHooks::getPinnedMemoryAllocator() const {
+  CUDAHooks::printCurrentContext();
   return at::cuda::getPinnedMemoryAllocator();
 }
 

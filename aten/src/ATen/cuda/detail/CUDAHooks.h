@@ -11,6 +11,7 @@ namespace at { namespace cuda { namespace detail {
 // The real implementation of CUDAHooksInterface
 struct CUDAHooks : public at::CUDAHooksInterface {
   CUDAHooks(at::CUDAHooksArgs) {}
+  void printCurrentContext() const;
   std::unique_ptr<THCState, void(*)(THCState*)> initCUDA() const override;
   Device getDeviceFromPtr(void* data) const override;
   bool isPinnedPtr(void* data) const override;
