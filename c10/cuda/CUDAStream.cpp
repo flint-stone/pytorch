@@ -235,13 +235,17 @@ static void initDeviceStreamState(DeviceIndex device_index) {
 #ifndef __HIP_PLATFORM_HCC__
     C10_CUDA_CHECK(cudaStreamCreateWithPriority(
         &lowpri_stream.stream, kDefaultFlags, kLowPriority));
+    LOG(WARNING) << "cudaStreamCreateWithPriority __HIP_PLATFORM_HCC__ kDefaultFlags " << kDefaultFlags << " kLowPriority " << kLowPriority;
     C10_CUDA_CHECK(cudaStreamCreateWithPriority(
         &hipri_stream.stream, kDefaultFlags, kHighPriority));
+    LOG(WARNING) << "cudaStreamCreateWithPriority __HIP_PLATFORM_HCC__ kDefaultFlags " << kDefaultFlags << " kHighPriority " << kHighPriority;
 #else
     C10_CUDA_CHECK(
         cudaStreamCreateWithFlags(&lowpri_stream.stream, kDefaultFlags));
+    LOG(WARNING) << "cudaStreamCreateWithPriority kDefaultFlags " << kDefaultFlags << " LowPriority ";
     C10_CUDA_CHECK(
         cudaStreamCreateWithFlags(&hipri_stream.stream, kDefaultFlags));
+    LOG(WARNING) << "cudaStreamCreateWithPriority kDefaultFlags " << kDefaultFlags << " HighPriority ";
 #endif // __HIP_PLATFORM_HCC__
   }
 }
