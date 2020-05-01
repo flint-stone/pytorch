@@ -44,7 +44,21 @@ if (${COMPILER_SUPPORTS_HIDDEN_VISIBILITY})
   target_compile_options(c10_cuda PRIVATE "-fvisibility=hidden")
 endif()
 
+#if(MSVC)
+#  list(APPEND TORCH_PYTHON_LINK_LIBRARIES ${NVTOOLEXT_HOME}/lib/x64/nvToolsExt64_1.lib)
+#  list(APPEND TORCH_PYTHON_INCLUDE_DIRECTORIES "${NVTOOLEXT_HOME}/include")
+#elseif(APPLE)
+#  list(APPEND TORCH_PYTHON_LINK_LIBRARIES ${CUDA_TOOLKIT_ROOT_DIR}/lib/libnvToolsExt.dylib)
+#else()
+#  find_library(LIBNVTOOLSEXT libnvToolsExt.so PATHS ${CUDA_TOOLKIT_ROOT_DIR}/lib64/)
+#  list(APPEND TORCH_PYTHON_LINK_LIBRARIES ${LIBNVTOOLSEXT})
+
+find_library(LIBNVTOOLSEXT libnvToolsExt.so PATHS ${CUDA_TOOLKIT_ROOT_DIR}/lib64/)
+
+
 # ---[ Dependency of c10_cuda
+target_link_libraries(c10_cuda ${LIBNVTOOLSEXT})
+
 target_link_libraries(c10_cuda PUBLIC c10)
 
 target_link_libraries(c10_cuda INTERFACE torch::cudart)
