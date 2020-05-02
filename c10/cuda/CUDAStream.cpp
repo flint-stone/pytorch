@@ -3,6 +3,8 @@
 #include <c10/cuda/CUDAGuard.h>
 #include <c10/util/Exception.h>
 
+#include <nvToolsExtCudaRt.h>
+
 #include <array>
 #include <atomic>
 #include <cstdint>
@@ -236,16 +238,20 @@ static void initDeviceStreamState(DeviceIndex device_index) {
     C10_CUDA_CHECK(cudaStreamCreateWithPriority(
         &lowpri_stream.stream, kDefaultFlags, kLowPriority));
     LOG(WARNING) << "cudaStreamCreateWithPriority __HIP_PLATFORM_HCC__ kDefaultFlags " << kDefaultFlags << " kLowPriority " << kLowPriority;
+    nvtxNameCudaStreamA(lowpri_stream.stream, "stream-hip-lowpri-" + std::str(i));
     C10_CUDA_CHECK(cudaStreamCreateWithPriority(
         &hipri_stream.stream, kDefaultFlags, kHighPriority));
     LOG(WARNING) << "cudaStreamCreateWithPriority __HIP_PLATFORM_HCC__ kDefaultFlags " << kDefaultFlags << " kHighPriority " << kHighPriority;
+    nvtxNameCudaStreamA(lowpri_stream.stream, "stream-hip-hipri-" + std::str(i));
 #else
     C10_CUDA_CHECK(
         cudaStreamCreateWithFlags(&lowpri_stream.stream, kDefaultFlags));
     LOG(WARNING) << "cudaStreamCreateWithPriority kDefaultFlags " << kDefaultFlags << " LowPriority ";
+    nvtxNameCudaStreamA(lowpri_stream.stream, "stream-lowpri-" + std::str(i));
     C10_CUDA_CHECK(
         cudaStreamCreateWithFlags(&hipri_stream.stream, kDefaultFlags));
     LOG(WARNING) << "cudaStreamCreateWithPriority kDefaultFlags " << kDefaultFlags << " HighPriority ";
+    nvtxNameCudaStreamA(lowpri_stream.stream, "stream-hipri-" + std::str(i));
 #endif // __HIP_PLATFORM_HCC__
   }
 }
