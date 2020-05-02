@@ -12,6 +12,19 @@ namespace c10 {
 
 class CAFFE2_API OperatorHandle;
 
+class DispatcherOperatorNames {
+private:
+	DispatcherOperatorNames();
+	DispatcherOperatorNames(DispatcherOperatorNames const& copy);
+	DispatcherOperatorNames& operator=(DispatcherOperatorNames const & copy);
+public:
+	static std::list<std::string> list;
+	static DispatcherOperatorNames& singleton(){
+		static DispatcherOperatorNames instance;
+		return instance;
+	}
+};
+
 /**
  * Implement this interface and register your instance with the dispatcher
  * to get notified when operators are registered or deregistered with
@@ -213,19 +226,6 @@ private:
 namespace detail {
 template<class... Args> inline void unused_arg_(const Args&...) {}
 }
-
-class DispatcherOperatorNames {
-private:
-	DispatcherOperatorNames();
-	DispatcherOperatorNames(DispatcherOperatorNames const& copy);
-	DispatcherOperatorNames& operator=(DispatcherOperatorNames const & copy);
-public:
-	static std::list<std::string> list;
-	static DispatcherOperatorNames& singleton(){
-		static DispatcherOperatorNames instance;
-		return instance;
-	}
-};
 
 template<class Return, class... Args>
 inline Return Dispatcher::callUnboxedWithDispatchKey(const OperatorHandle& op, DispatchKey dispatchKey, Args... args) const {
