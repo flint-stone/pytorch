@@ -5,6 +5,8 @@
 //#include <ATen/core/dispatch/DispatcherOperatorNames.h>
 #include <c10/util/Exception.h>
 #include <c10/util/LeftRight.h>
+
+#include <unistd.h>
 #include <mutex>
 #include <list>
 #include <thread>
@@ -187,6 +189,7 @@ public:
 	~DispatcherOperatorNames() {};
 
 	static DispatcherOperatorNames& singleton(){
+		LOG(WARNING) << "DispatcherOperatorNames init: " << " thread id " << std::this_thread::get_id() << " pid: " << getpid();
 		static DispatcherOperatorNames instance;
 		return instance;
 	}
@@ -283,9 +286,9 @@ inline void Dispatcher::callBoxed(const OperatorHandle& op, Stack* stack) const 
 
 inline const KernelFunction& Dispatcher::dispatch_(const DispatchTable& dispatchTable, DispatchKey dispatchKey) const {
   const KernelFunction* backendKernel = dispatchTable.lookup(dispatchKey);
-  LOG(WARNING) << "Dispatcher::dispatch_ " +  std::string(toString(dispatchKey)) << " thread id " << std::this_thread::get_id()  ;
+  LOG(WARNING) << "Dispatcher::dispatch_ " +  std::string(toString(dispatchKey)) << " thread id " << std::this_thread::get_id() << " history size: " << c10::DispatcherOperatorNames::singleton().size()  ;
   std::string list_of_names = "List of names: " + c10::DispatcherOperatorNames::singleton().readNames();
-  LOG(WARNING) << "Dispatcher::list of operators: size " <<c10:: DispatcherOperatorNames::singleton().size() << " -- " << list_of_names;
+  //LOG(WARNING) << "Dispatcher::list of operators: size " <<c10:: DispatcherOperatorNames::singleton().size() << " -- " << list_of_names;
   if (nullptr != backendKernel) {
     return *backendKernel;
   }
