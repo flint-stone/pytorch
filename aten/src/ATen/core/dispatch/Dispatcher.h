@@ -178,12 +178,14 @@ private:
 class CAFFE2_API DispatcherOperatorNames final {
 private:
 	DispatcherOperatorNames();
-	DispatcherOperatorNames(DispatcherOperatorNames const& copy);
-	DispatcherOperatorNames& operator=(DispatcherOperatorNames const & copy);
+//	DispatcherOperatorNames(DispatcherOperatorNames const& copy);
+//	DispatcherOperatorNames& operator=(DispatcherOperatorNames const & copy);
 	std::list<std::string> list;
 	friend class Dispatcher;
 
 public:
+	~Dispatcher();
+
 	static DispatcherOperatorNames& singleton(){
 		static DispatcherOperatorNames instance;
 		return instance;
