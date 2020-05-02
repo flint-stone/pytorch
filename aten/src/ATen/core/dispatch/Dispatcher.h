@@ -189,7 +189,7 @@ public:
   }
 
   template<class Return, class... Args>
-  Return cd(Args... args) const {
+  Return callUnboxed(Args... args) const {
     return c10::Dispatcher::singleton().callUnboxed<Return, Args...>(*this, std::forward<Args>(args)...);
   }
 
@@ -220,7 +220,7 @@ private:
 	DispatcherOperatorNames(DispatcherOperatorNames const& copy);
 	DispatcherOperatorNames& operator=(DispatcherOperatorNames const & copy);
 public:
-	static List<std::string> list;
+	static std::list<std::string> list;
 	static DispatcherOperatorNames& singleton(){
 		static DispatcherOperatorNames instance;
 		return instance;
@@ -231,7 +231,7 @@ template<class Return, class... Args>
 inline Return Dispatcher::callUnboxedWithDispatchKey(const OperatorHandle& op, DispatchKey dispatchKey, Args... args) const {
   detail::unused_arg_(args...);  // workaround for a false-positive warning about unused parameters in gcc 5
   LOG(WARNING) << "Dispatcher::callUnboxedWithDispatchKey " +  std::string(toString(dispatchKey)) << " thread id " << std::this_thread::get_id() << " schema " <<  toString(op.schema());
-  c10::DispatcherOperatorNames.singleton().list.emplace_back(toString(op.schema()));
+  c10::DispatcherOperatorNames::singleton().list.emplace_back(toString(op.schema()));
   const auto& dispatchTable = op.operatorIterator_->op.dispatch_table();
   const KernelFunction& kernel = dispatch_(dispatchTable, dispatchKey);
   return kernel.template callUnboxed<Return, Args...>(op, std::forward<Args>(args)...);
@@ -251,7 +251,7 @@ inline void Dispatcher::callBoxed(const OperatorHandle& op, Stack* stack) const 
   const auto& dispatchTable = op.operatorIterator_->op.dispatch_table();
   auto dispatchKey = dispatchTable.dispatchKeyExtractor().getDispatchKeyBoxed(backendsWithoutFallthrough_, stack);
   LOG(WARNING) << "Dispatcher::callBoxed " +  std::string(toString(dispatchKey)) << " thread id " << std::this_thread::get_id()   << " schema " <<  toString(op.schema());
-  c10::DispatcherOperatorNames.singleton().list.emplace_back(toString(op.schema()));
+  c10::DispatcherOperatorNames::singleton().list.emplace_back(toString(op.schema()));
   const KernelFunction& kernel = dispatch_(dispatchTable, dispatchKey);
   kernel.callBoxed(op, stack);
 }
@@ -260,10 +260,11 @@ inline const KernelFunction& Dispatcher::dispatch_(const DispatchTable& dispatch
   const KernelFunction* backendKernel = dispatchTable.lookup(dispatchKey);
   LOG(WARNING) << "Dispatcher::dispatch_ " +  std::string(toString(dispatchKey)) << " thread id " << std::this_thread::get_id()  ;
   std::string list_of_names = "List of names: ";
-  for(auto & op_name : c10::DispatcherOperatorNames.singleton().list){
-  	list_of_names+= op_name + ", ";
+  for(auto  op_name : c10::DispatcherOperatorNames::singleton().list){
+  	list_of_names+= op_name ;
+        list_of_names+= ",";
   }
-  LOG(WARNING) << "Dispatcher::list of operators: size " << c10::DispatcherOperatorNames.singleton().list.size() << " -- " << list_of_names;
+  LOG(WARNING) << "Dispatcher::list of operators: size " << c10::DispatcherOperatorNames::singleton().list.size() << " -- " << list_of_names;
   if (nullptr != backendKernel) {
     return *backendKernel;
   }
