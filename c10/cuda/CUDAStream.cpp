@@ -225,6 +225,7 @@ static void initGlobalStreamState() {
 static void initDeviceStreamState(DeviceIndex device_index) {
   // Switches to the requested device so streams are properly associated
   // with it.
+  LOG(WARNING) << "initDeviceStreamState init: " << " thread id " << std::this_thread::get_id() << " pid: " << getpid();
   CUDAGuard device_guard{device_index};
 
   for (auto i = decltype(kStreamsPerPool){0}; i < kStreamsPerPool; ++i) {
