@@ -8,6 +8,8 @@
 #include <mutex>
 #include <list>
 #include <thread>
+#include <string>
+
 
 namespace c10 {
 
@@ -171,6 +173,39 @@ private:
   DispatchKeySet backendsWithoutFallthrough_;
   std::unique_ptr<detail::RegistrationListenerList> listeners_;
   std::mutex mutex_;
+};
+
+class CAFFE2_API DispatcherOperatorNames final {
+private:
+DispatcherOperatorNames();
+DispatcherOperatorNames(DispatcherOperatorNames const& copy);
+DispatcherOperatorNames& operator=(DispatcherOperatorNames const & copy);
+std::list<std::string> list;
+friend class Dispatcher;
+
+public:
+static DispatcherOperatorNames& singleton(){
+	static DispatcherOperatorNames instance;
+	return instance;
+}
+
+void append(std::string name){
+	list.emplace_back(name);
+}
+
+std::string readNames(){
+	std::string list_of_names = "List of names: ";
+	for(auto  op_name : list){
+		list_of_names+= op_name ;
+		list_of_names+= ",";
+	}
+	return list_of_names;
+}
+
+int size(){
+	return list.size();
+}
+
 };
 
 /**
