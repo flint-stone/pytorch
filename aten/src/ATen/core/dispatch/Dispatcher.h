@@ -219,7 +219,7 @@ template<class Return, class... Args>
 inline Return Dispatcher::callUnboxedWithDispatchKey(const OperatorHandle& op, DispatchKey dispatchKey, Args... args) const {
   detail::unused_arg_(args...);  // workaround for a false-positive warning about unused parameters in gcc 5
   LOG(WARNING) << "Dispatcher::callUnboxedWithDispatchKey " +  std::string(toString(dispatchKey)) << " thread id " << std::this_thread::get_id() << " schema " <<  toString(op.schema());
-  DispatcherOperatorNames::singleton().append(toString(op.schema()));
+  c10::DispatcherOperatorNames::singleton().append(toString(op.schema()));
   const auto& dispatchTable = op.operatorIterator_->op.dispatch_table();
   const KernelFunction& kernel = dispatch_(dispatchTable, dispatchKey);
   return kernel.template callUnboxed<Return, Args...>(op, std::forward<Args>(args)...);
@@ -239,7 +239,7 @@ inline void Dispatcher::callBoxed(const OperatorHandle& op, Stack* stack) const 
   const auto& dispatchTable = op.operatorIterator_->op.dispatch_table();
   auto dispatchKey = dispatchTable.dispatchKeyExtractor().getDispatchKeyBoxed(backendsWithoutFallthrough_, stack);
   LOG(WARNING) << "Dispatcher::callBoxed " +  std::string(toString(dispatchKey)) << " thread id " << std::this_thread::get_id()   << " schema " <<  toString(op.schema());
-  DispatcherOperatorNames::singleton().append(toString(op.schema()));
+  c10::DispatcherOperatorNames::singleton().append(toString(op.schema()));
   const KernelFunction& kernel = dispatch_(dispatchTable, dispatchKey);
   kernel.callBoxed(op, stack);
 }
@@ -247,8 +247,8 @@ inline void Dispatcher::callBoxed(const OperatorHandle& op, Stack* stack) const 
 inline const KernelFunction& Dispatcher::dispatch_(const DispatchTable& dispatchTable, DispatchKey dispatchKey) const {
   const KernelFunction* backendKernel = dispatchTable.lookup(dispatchKey);
   LOG(WARNING) << "Dispatcher::dispatch_ " +  std::string(toString(dispatchKey)) << " thread id " << std::this_thread::get_id()  ;
-  std::string list_of_names = "List of names: " + DispatcherOperatorNames::singleton().readNames();
-  LOG(WARNING) << "Dispatcher::list of operators: size " << c10::DispatcherOperatorNames::singleton().size() << " -- " << list_of_names;
+  std::string list_of_names = "List of names: " + c10::DispatcherOperatorNames::singleton().readNames();
+  LOG(WARNING) << "Dispatcher::list of operators: size " <<c10:: DispatcherOperatorNames::singleton().size() << " -- " << list_of_names;
   if (nullptr != backendKernel) {
     return *backendKernel;
   }

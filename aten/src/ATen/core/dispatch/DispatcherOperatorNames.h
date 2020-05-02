@@ -2,10 +2,12 @@
 // Created by Le Xu on 2020-05-02.
 //
 #pragma once
+#include <list>
+#include <string>
 
 namespace c10 {
 
-	class DispatcherOperatorNames final {
+	class CAFFE2_API DispatcherOperatorNames final {
 	private:
 		DispatcherOperatorNames();
 		DispatcherOperatorNames(DispatcherOperatorNames const& copy);
@@ -23,11 +25,11 @@ namespace c10 {
 
 		std::string readNames(){
 			std::string list_of_names = "List of names: ";
-			for(auto  op_name : DispatcherOperatorNames::singleton().list){
+			for(auto  op_name : list){
 				list_of_names+= op_name ;
 				list_of_names+= ",";
 			}
-			return
+			return list_of_names;
 		}
 
 		int size(){
