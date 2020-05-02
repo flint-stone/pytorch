@@ -177,11 +177,11 @@ private:
 
 class CAFFE2_API DispatcherOperatorNames final {
 private:
-	DispatcherOperatorNames(){}
+	std::list<std::string> list;
+//	friend class Dispatcher;
+	DispatcherOperatorNames():list(){}
 //	DispatcherOperatorNames(DispatcherOperatorNames const& copy);
 //	DispatcherOperatorNames& operator=(DispatcherOperatorNames const & copy);
-	std::list<std::string> list;
-	friend class Dispatcher;
 
 public:
 	~DispatcherOperatorNames() {};
