@@ -57,7 +57,7 @@ find_library(LIBNVTOOLSEXT libnvToolsExt.so PATHS ${CUDA_TOOLKIT_ROOT_DIR}/lib64
 
 
 # ---[ Dependency of c10_cuda
-target_link_libraries(c10_cuda ${LIBNVTOOLSEXT})
+target_link_libraries(c10_cuda PRIVATE  ${LIBNVTOOLSEXT})
 
 target_link_libraries(c10_cuda PUBLIC c10)
 

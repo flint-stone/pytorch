@@ -6,6 +6,7 @@
 
 // TODO Also register c10 operators on mobile
 #if !defined(CAFFE2_IS_XPLAT_BUILD) && !defined(C10_MOBILE)
+#include <ATen/core/dispatch/DispatcherOperatorNames.h>
 #include <ATen/core/dispatch/Dispatcher.h>
 #include <ATen/core/ivalue.h>
 #include <c10/util/ArrayRef.h>
