@@ -234,24 +234,31 @@ static void initDeviceStreamState(DeviceIndex device_index) {
     lowpri_stream.device_index = device_index;
     hipri_stream.device_index = device_index;
 
+    std::string str_name;
 #ifndef __HIP_PLATFORM_HCC__
     C10_CUDA_CHECK(cudaStreamCreateWithPriority(
         &lowpri_stream.stream, kDefaultFlags, kLowPriority));
     LOG(WARNING) << "cudaStreamCreateWithPriority __HIP_PLATFORM_HCC__ kDefaultFlags " << kDefaultFlags << " kLowPriority " << kLowPriority;
-    nvtxNameCudaStreamA(lowpri_stream.stream, "stream-hip-lowpri-" + std::str(i));
+    str_name = "stream-hip-lowpri-" + std::to_string(i);
+    nvtxNameCudaStreamA(lowpri_stream.stream, str_name.c_str());
     C10_CUDA_CHECK(cudaStreamCreateWithPriority(
         &hipri_stream.stream, kDefaultFlags, kHighPriority));
+    str_name = "stream-hip-hipri-" + std::to_string(i);
     LOG(WARNING) << "cudaStreamCreateWithPriority __HIP_PLATFORM_HCC__ kDefaultFlags " << kDefaultFlags << " kHighPriority " << kHighPriority;
-    nvtxNameCudaStreamA(lowpri_stream.stream, "stream-hip-hipri-" + std::str(i));
+    nvtxNameCudaStreamA(lowpri_stream.stream, str_name.c_str());
 #else
+    str_name = "stream-lowpri-" + std::to_string(i);
     C10_CUDA_CHECK(
         cudaStreamCreateWithFlags(&lowpri_stream.stream, kDefaultFlags));
     LOG(WARNING) << "cudaStreamCreateWithPriority kDefaultFlags " << kDefaultFlags << " LowPriority ";
-    nvtxNameCudaStreamA(lowpri_stream.stream, "stream-lowpri-" + std::str(i));
+
+    nvtxNameCudaStreamA(lowpri_stream.stream, str_name.c_str());
+
+    str_name = "stream-hipri-" + std::to_string(i);
     C10_CUDA_CHECK(
         cudaStreamCreateWithFlags(&hipri_stream.stream, kDefaultFlags));
     LOG(WARNING) << "cudaStreamCreateWithPriority kDefaultFlags " << kDefaultFlags << " HighPriority ";
-    nvtxNameCudaStreamA(lowpri_stream.stream, "stream-hipri-" + std::str(i));
+    nvtxNameCudaStreamA(lowpri_stream.stream, str_name.c_str());
 #endif // __HIP_PLATFORM_HCC__
   }
 }
