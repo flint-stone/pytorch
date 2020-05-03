@@ -179,16 +179,15 @@ private:
 
 class CAFFE2_API DispatcherOperatorNames final {
 private:
-	std::list<std::string> list;
-    std::mutex mutex_;
+	static std::list<std::string> list;
+	static std::mutex mutex_;
 //	friend class Dispatcher;
-	DispatcherOperatorNames():
-	list(),
-	mutex_(){
+	DispatcherOperatorNames()
+	{
 		LOG(WARNING) << "DispatcherOperatorNames init: " << " thread id " << std::this_thread::get_id() << " pid: " << getpid();
 	}
-//	DispatcherOperatorNames(DispatcherOperatorNames const& copy);
-//	DispatcherOperatorNames& operator=(DispatcherOperatorNames const & copy);
+	DispatcherOperatorNames(DispatcherOperatorNames const& copy);
+	DispatcherOperatorNames& operator=(DispatcherOperatorNames const & copy);
 
 public:
 	~DispatcherOperatorNames() {};

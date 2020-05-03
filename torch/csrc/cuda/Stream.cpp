@@ -13,7 +13,7 @@
 
 PyObject *THCPStreamClass = nullptr;
 
-static PyObject *
+static PyObject * THCPStream_pynew
 (
   PyTypeObject *type, PyObject *args, PyObject *kwargs) {
   HANDLE_TH_ERRORS

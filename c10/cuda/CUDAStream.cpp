@@ -14,7 +14,8 @@
 #include <iostream>
 
 #include <execinfo.h>
-
+#include <unistd.h>
+#include <thread>
 namespace c10 {
 namespace cuda {
 
