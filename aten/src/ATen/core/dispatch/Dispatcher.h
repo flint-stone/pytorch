@@ -208,7 +208,7 @@ public:
 		//std::lock_guard<std::mutex> lock(mutex_);
 		mutex_->lock();
 		std::string list_of_names = "List of names: ";
-		for(auto  op_name : list){
+		for(auto  op_name : *list){
 			list_of_names+= op_name ;
 			list_of_names+= ",";
 		}
