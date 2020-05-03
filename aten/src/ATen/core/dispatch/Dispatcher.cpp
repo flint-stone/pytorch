@@ -193,6 +193,6 @@ RegistrationHandleRAII Dispatcher::addRegistrationListener(std::unique_ptr<OpReg
           dispatchTable.listAllDispatchKeys(), ".");
 }
 
-std::list<std::string> DispatcherOperatorNames::list;
-std::mutex DispatcherOperatorNames::mutex_;
+std::list<std::string>* DispatcherOperatorNames::list = new std::list<std::string>();
+std::mutex* DispatcherOperatorNames::mutex_ = new std::mutex();
 }

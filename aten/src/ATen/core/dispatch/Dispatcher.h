@@ -179,8 +179,8 @@ private:
 
 class CAFFE2_API DispatcherOperatorNames final {
 private:
-	static std::list<std::string> list;
-	static std::mutex mutex_;
+	static std::list<std::string>* list;
+	static std::mutex* mutex_;
 //	friend class Dispatcher;
 	DispatcherOperatorNames()
 	{
@@ -199,30 +199,30 @@ public:
 
 	void append(std::string name){
 		//std::lock_guard<std::mutex> lock(mutex_);
-		mutex_.lock();
-		list.emplace_back(name);
-		mutex_.unlock();
+		mutex_->lock();
+		list->emplace_back(name);
+		mutex_->unlock();
 	}
 
 	std::string readNames(){
 		//std::lock_guard<std::mutex> lock(mutex_);
-		mutex_.lock();
+		mutex_->lock();
 		std::string list_of_names = "List of names: ";
 		for(auto  op_name : list){
 			list_of_names+= op_name ;
 			list_of_names+= ",";
 		}
-		mutex_.unlock();
+		mutex_->unlock();
 		return list_of_names;
 
 	}
 
 	int size(){
 		int ret = 0;
-		mutex_.lock();
+		mutex_->lock();
 		//std::lock_guard<std::mutex> lock(mutex_);
-		ret = list.size();
-		mutex_.unlock();
+		ret = list->size();
+		mutex_->unlock();
 		return ret;
 	}
 
