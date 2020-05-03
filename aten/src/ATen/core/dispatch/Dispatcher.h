@@ -180,8 +180,13 @@ private:
 class CAFFE2_API DispatcherOperatorNames final {
 private:
 	std::list<std::string> list;
+    std::mutex mutex_;
 //	friend class Dispatcher;
-	DispatcherOperatorNames():list(){}
+	DispatcherOperatorNames():
+	list(),
+	mutex_(){
+		LOG(WARNING) << "DispatcherOperatorNames init: " << " thread id " << std::this_thread::get_id() << " pid: " << getpid();
+	}
 //	DispatcherOperatorNames(DispatcherOperatorNames const& copy);
 //	DispatcherOperatorNames& operator=(DispatcherOperatorNames const & copy);
 
@@ -189,16 +194,17 @@ public:
 	~DispatcherOperatorNames() {};
 
 	static DispatcherOperatorNames& singleton(){
-		LOG(WARNING) << "DispatcherOperatorNames init: " << " thread id " << std::this_thread::get_id() << " pid: " << getpid();
 		static DispatcherOperatorNames instance;
 		return instance;
 	}
 
 	void append(std::string name){
+		std::lock_guard<std::mutex> lock(mutex_);
 		list.emplace_back(name);
 	}
 
 	std::string readNames(){
+		std::lock_guard<std::mutex> lock(mutex_);
 		std::string list_of_names = "List of names: ";
 		for(auto  op_name : list){
 			list_of_names+= op_name ;
@@ -208,6 +214,7 @@ public:
 	}
 
 	int size(){
+		std::lock_guard<std::mutex> lock(mutex_);
 		return list.size();
 	}
 
@@ -288,7 +295,7 @@ inline const KernelFunction& Dispatcher::dispatch_(const DispatchTable& dispatch
   const KernelFunction* backendKernel = dispatchTable.lookup(dispatchKey);
   LOG(WARNING) << "Dispatcher::dispatch_ " +  std::string(toString(dispatchKey)) << " thread id " << std::this_thread::get_id() << " history size: " << c10::DispatcherOperatorNames::singleton().size()  ;
   std::string list_of_names = "List of names: " + c10::DispatcherOperatorNames::singleton().readNames();
-  //LOG(WARNING) << "Dispatcher::list of operators: size " <<c10:: DispatcherOperatorNames::singleton().size() << " -- " << list_of_names;
+  LOG(WARNING) << "Dispatcher::list of operators: size " <<c10:: DispatcherOperatorNames::singleton().size() << " -- " << list_of_names;
   if (nullptr != backendKernel) {
     return *backendKernel;
   }
