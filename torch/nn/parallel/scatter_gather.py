@@ -1,4 +1,5 @@
 import torch
+import warnings
 from ._functions import Scatter, Gather
 
 
