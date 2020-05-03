@@ -198,23 +198,32 @@ public:
 	}
 
 	void append(std::string name){
-		std::lock_guard<std::mutex> lock(mutex_);
+		//std::lock_guard<std::mutex> lock(mutex_);
+		mutex_.lock();
 		list.emplace_back(name);
+		mutex_.unlock();
 	}
 
 	std::string readNames(){
-		std::lock_guard<std::mutex> lock(mutex_);
+		//std::lock_guard<std::mutex> lock(mutex_);
+		mutex_.lock();
 		std::string list_of_names = "List of names: ";
 		for(auto  op_name : list){
 			list_of_names+= op_name ;
 			list_of_names+= ",";
 		}
+		mutex_.unlock();
 		return list_of_names;
+
 	}
 
 	int size(){
-		std::lock_guard<std::mutex> lock(mutex_);
-		return list.size();
+		int ret = 0;
+		mutex_.lock();
+		//std::lock_guard<std::mutex> lock(mutex_);
+		ret = list.size();
+		mutex_.unlock();
+		return ret;
 	}
 
 };
