@@ -44,7 +44,7 @@ Dispatcher::Dispatcher()
 , backendsWithoutFallthrough_(DispatchKeySet::FULL)
 , listeners_(std::make_unique<detail::RegistrationListenerList>())
 , mutex_() {
-	LOG(WARNING) << "Dispatcher init: " << " thread id " << std::this_thread::get_id() << " pid: " << getpid();
+	LOG(WARNING) << "Dispatcher init: " << " thread id " << std::this_thread::get_id() << " tid " << gettid() << " pid: " << getpid() ;
 }
 
 Dispatcher::~Dispatcher() {}

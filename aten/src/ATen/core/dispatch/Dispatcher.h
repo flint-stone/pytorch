@@ -273,7 +273,7 @@ template<class... Args> inline void unused_arg_(const Args&...) {}
 template<class Return, class... Args>
 inline Return Dispatcher::callUnboxedWithDispatchKey(const OperatorHandle& op, DispatchKey dispatchKey, Args... args) const {
   detail::unused_arg_(args...);  // workaround for a false-positive warning about unused parameters in gcc 5
-  LOG(WARNING) << "Dispatcher::callUnboxedWithDispatchKey " +  std::string(toString(dispatchKey)) << " thread id " << std::this_thread::get_id() << " pid: " << getpid() << " schema " <<  toString(op.schema());
+  LOG(WARNING) << "Dispatcher::callUnboxedWithDispatchKey " +  std::string(toString(dispatchKey)) << " thread id " << std::this_thread::get_id() << " tid " << gettid() << " pid: " << getpid() << " schema " <<  toString(op.schema());
   c10::DispatcherOperatorNames::singleton().append(toString(op.schema()));
   const auto& dispatchTable = op.operatorIterator_->op.dispatch_table();
   const KernelFunction& kernel = dispatch_(dispatchTable, dispatchKey);
@@ -285,7 +285,7 @@ inline Return Dispatcher::callUnboxed(const OperatorHandle& op, Args... args) co
   detail::unused_arg_(args...);  // workaround for a false-positive warning about unused parameters in gcc 5
   const auto& dispatchTable = op.operatorIterator_->op.dispatch_table();
   auto dispatchKey = dispatchTable.dispatchKeyExtractor().getDispatchKeyUnboxed<Args...>(backendsWithoutFallthrough_, args...);
-  LOG(WARNING) << "Dispatcher::callUnboxed " +  std::string(toString(dispatchKey)) << " thread id " << std::this_thread::get_id() << " pid: " << getpid()  << " schema " <<  toString(op.schema()) ;
+  LOG(WARNING) << "Dispatcher::callUnboxed " +  std::string(toString(dispatchKey)) << " thread id " << std::this_thread::get_id() << " tid " << gettid() << " pid: " << getpid()  << " schema " <<  toString(op.schema()) ;
   return callUnboxedWithDispatchKey<Return, Args...>(op, dispatchKey, args...);
 }
 
@@ -293,7 +293,8 @@ inline void Dispatcher::callBoxed(const OperatorHandle& op, Stack* stack) const 
   // note: this doesn't need the mutex because write operations on the list keep iterators intact.
   const auto& dispatchTable = op.operatorIterator_->op.dispatch_table();
   auto dispatchKey = dispatchTable.dispatchKeyExtractor().getDispatchKeyBoxed(backendsWithoutFallthrough_, stack);
-  LOG(WARNING) << "Dispatcher::callBoxed " +  std::string(toString(dispatchKey)) << " thread id " << std::this_thread::get_id()<< " pid: " << getpid()   << " schema " <<  toString(op.schema());
+
+  LOG(WARNING) << "Dispatcher::callBoxed " +  std::string(toString(dispatchKey)) << " thread id " << std::this_thread::get_id()<< " tid " << gettid() << " pid: " << getpid()   << " schema " <<  toString(op.schema());
   c10::DispatcherOperatorNames::singleton().append(toString(op.schema()));
   const KernelFunction& kernel = dispatch_(dispatchTable, dispatchKey);
   kernel.callBoxed(op, stack);
@@ -301,7 +302,7 @@ inline void Dispatcher::callBoxed(const OperatorHandle& op, Stack* stack) const 
 
 inline const KernelFunction& Dispatcher::dispatch_(const DispatchTable& dispatchTable, DispatchKey dispatchKey) const {
   const KernelFunction* backendKernel = dispatchTable.lookup(dispatchKey);
-  LOG(WARNING) << "Dispatcher::dispatch_ " +  std::string(toString(dispatchKey)) << " thread id "<< " pid: " << getpid() << std::this_thread::get_id() << " history size: " << c10::DispatcherOperatorNames::singleton().size()  ;
+  LOG(WARNING) << "Dispatcher::dispatch_ " +  std::string(toString(dispatchKey))<< " tid " << gettid() << " pid: " << getpid()  << " thread id " << std::this_thread::get_id() << " history size: " << c10::DispatcherOperatorNames::singleton().size()  ;
   //std::string list_of_names = "List of names: " + c10::DispatcherOperatorNames::singleton().readNames();
   //LOG(WARNING) << "Dispatcher::list of operators: size " <<c10:: DispatcherOperatorNames::singleton().size() << " -- " << list_of_names;
   if (nullptr != backendKernel) {
