@@ -1,6 +1,7 @@
 import operator
 import torch
 import warnings
+import os
 from itertools import chain
 from ..modules import Module
 from .scatter_gather import scatter_kwargs, gather
@@ -127,6 +128,7 @@ class DataParallel(Module):
         if output_device is None:
             output_device = device_ids[0]
 
+        warnings.warn("DataParallel: " + str(module))
         self.dim = dim
         self.module = module
         self.device_ids = list(map(lambda x: _get_device_index(x, True), device_ids))
@@ -134,8 +136,8 @@ class DataParallel(Module):
         self.src_device_obj = torch.device("cuda:{}".format(self.device_ids[0]))
 
         _check_balance(self.device_ids)
-
         if len(self.device_ids) == 1:
+
             self.module.cuda(device_ids[0])
 
     def forward(self, *inputs, **kwargs):
@@ -150,9 +152,12 @@ class DataParallel(Module):
 
         inputs, kwargs = self.scatter(inputs, kwargs, self.device_ids)
         if len(self.device_ids) == 1:
+            warnings.warn("DataParallel: forward device_ids " + str(self.device_ids))
             return self.module(*inputs[0], **kwargs[0])
         replicas = self.replicate(self.module, self.device_ids[:len(inputs)])
+        warnings.warn("DataParallel: replicate device_ids " + str(self.device_ids[:len(inputs)]) + " pid " + os.getpid())
         outputs = self.parallel_apply(replicas, inputs, kwargs)
+        warnings.warn("DataParallel: gather self.output_device " + str(self.output_device)+" pid " + os.getpid())
         return self.gather(outputs, self.output_device)
 
     def replicate(self, module, device_ids):

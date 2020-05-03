@@ -26,6 +26,7 @@ def scatter(inputs, target_gpus, dim=0):
     # None, clearing the cell
     try:
         res = scatter_map(inputs)
+        warnings.warn("scatter_gather: scatter_map: " + str(res))
     finally:
         scatter_map = None
     return res
