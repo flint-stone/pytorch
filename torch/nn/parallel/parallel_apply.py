@@ -1,5 +1,6 @@
 import threading
 import torch
+import os
 from torch.cuda._utils import _get_device_index
 from torch._utils import ExceptionWrapper
 
@@ -47,8 +48,13 @@ def parallel_apply(modules, inputs, kwargs_tup=None, devices=None):
     lock = threading.Lock()
     results = {}
     grad_enabled = torch.is_grad_enabled()
+    warnings.warn("parallel_apply: devices " + str(devices) + " modules " + str(modules))
 
     def _worker(i, module, input, kwargs, device=None):
+        if device == None:
+            warnings.warn("parallel_apply: thread.start " + str(i) + " " + str(module) + " pid " + os.getpid() )
+        else:
+            warnings.warn("parallel_apply: thread.start " + str(i) + " " + str(module) + " device " + str(device)+ " pid " + os.getpid() )
         torch.set_grad_enabled(grad_enabled)
         if device is None:
             device = get_a_var(input).get_device()
