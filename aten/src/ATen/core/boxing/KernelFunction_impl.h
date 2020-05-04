@@ -52,6 +52,7 @@ inline void KernelFunction::callBoxed(const OperatorHandle& opHandle, Stack* sta
     }
 
     (*boxed_kernel_func_)(getFunctor_(), opHandle, stack);
+	c10::DispatcherOperatorNames::singleton().remove();
 }
 
 template<class Return, class... Args>
@@ -75,7 +76,7 @@ inline KernelFunction KernelFunction::makeFromBoxedFunction() {
     return KernelFunction(
         nullptr,  // no functorFactory_, this can only be called in a boxed way.
         nullptr,  // no functor_ object either
-        &make_boxed_function<func>,
+        &make_boxed_function<func>,Ker
         nullptr  // no unboxed function pointer
     );
 }

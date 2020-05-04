@@ -2,7 +2,7 @@
 
 #include <ATen/core/dispatch/OperatorEntry.h>
 #include <ATen/core/dispatch/RegistrationHandleRAII.h>
-//#include <ATen/core/dispatch/DispatcherOperatorNames.h>
+#include <ATen/core/dispatch/DispatcherOperatorNames.h>
 #include <c10/util/Exception.h>
 #include <c10/util/LeftRight.h>
 
@@ -180,64 +180,64 @@ private:
   std::mutex mutex_;
 };
 
-class CAFFE2_API DispatcherOperatorNames final {
-private:
-	static std::list<std::string>* list;
-	static std::mutex* mutex_;
-	static int operation_count_;
-//	friend class Dispatcher;
-	DispatcherOperatorNames()
-	{
-		LOG(WARNING) << "DispatcherOperatorNames init: " << " thread id " << std::this_thread::get_id() << " pid: " << getpid();
-	}
-	DispatcherOperatorNames(DispatcherOperatorNames const& copy);
-	DispatcherOperatorNames& operator=(DispatcherOperatorNames const & copy);
-
-public:
-	~DispatcherOperatorNames() {};
-
-	static DispatcherOperatorNames& singleton(){
-		static DispatcherOperatorNames instance;
-		return instance;
-	}
-
-	void append(std::string name){
-		//std::lock_guard<std::mutex> lock(mutex_);
-		mutex_->lock();
-		list->emplace_back(name);
-		operation_count_++;
-		mutex_->unlock();
-	}
-
-	void remove(){
-		mutex_ -> lock();
-		operation_count_--;
-		mutex_ -> unlock();
-	}
-
-	std::string readNames(){
-		//std::lock_guard<std::mutex> lock(mutex_);
-		mutex_->lock();
-		std::string list_of_names = "List of names: ";
-		for(auto  op_name : *list){
-			list_of_names+= op_name ;
-			list_of_names+= ",";
-		}
-		mutex_->unlock();
-		return list_of_names;
-
-	}
-
-	int size(){
-		int ret = 0;
-		mutex_->lock();
-		//std::lock_guard<std::mutex> lock(mutex_);
-		ret = list->size();
-		mutex_->unlock();
-		return ret;
-	}
-
-};
+//class CAFFE2_API DispatcherOperatorNames final {
+//private:
+//	static std::list<std::string>* list;
+//	static std::mutex* mutex_;
+//	static int operation_count_;
+////	friend class Dispatcher;
+//	DispatcherOperatorNames()
+//	{
+//		LOG(WARNING) << "DispatcherOperatorNames init: " << " thread id " << std::this_thread::get_id() << " pid: " << getpid();
+//	}
+//	DispatcherOperatorNames(DispatcherOperatorNames const& copy);
+//	DispatcherOperatorNames& operator=(DispatcherOperatorNames const & copy);
+//
+//public:
+//	~DispatcherOperatorNames() {};
+//
+//	static DispatcherOperatorNames& singleton(){
+//		static DispatcherOperatorNames instance;
+//		return instance;
+//	}
+//
+//	void append(std::string name){
+//		//std::lock_guard<std::mutex> lock(mutex_);
+//		mutex_->lock();
+//		list->emplace_back(name);
+//		operation_count_++;
+//		mutex_->unlock();
+//	}
+//
+//	void remove(){
+//		mutex_ -> lock();
+//		operation_count_--;
+//		mutex_ -> unlock();
+//	}
+//
+//	std::string readNames(){
+//		//std::lock_guard<std::mutex> lock(mutex_);
+//		mutex_->lock();
+//		std::string list_of_names = "List of names: ";
+//		for(auto  op_name : *list){
+//			list_of_names+= op_name ;
+//			list_of_names+= ",";
+//		}
+//		mutex_->unlock();
+//		return list_of_names;
+//
+//	}
+//
+//	int size(){
+//		int ret = 0;
+//		mutex_->lock();
+//		//std::lock_guard<std::mutex> lock(mutex_);
+//		ret = list->size();
+//		mutex_->unlock();
+//		return ret;
+//	}
+//
+//};
 
 /**
  * This is a handle to an operator schema registered with the dispatcher.
@@ -257,33 +257,33 @@ public:
 
   template<class Return, class... Args>
   Return callUnboxed(Args... args) const {
-    //return c10::Dispatcher::singleton().callUnboxed<Return, Args...>(*this, std::forward<Args>(args)...);
-    if(std::is_same<Return, void>::value){
-		c10::Dispatcher::singleton().callUnboxed<Return, Args...>(*this, std::forward<Args>(args)...);
-		c10::DispatcherOperatorNames::singleton().remove();
-    	return;
-    }
-    Return r = c10::Dispatcher::singleton().callUnboxed<Return, Args...>(*this, std::forward<Args>(args)...);
-    c10::DispatcherOperatorNames::singleton().remove();
-    return r;
+    return c10::Dispatcher::singleton().callUnboxed<Return, Args...>(*this, std::forward<Args>(args)...);
+//    if(std::is_same<Return, void>::value){
+//		c10::Dispatcher::singleton().callUnboxed<Return, Args...>(*this, std::forward<Args>(args)...);
+//		c10::DispatcherOperatorNames::singleton().remove();
+//    	return;
+//    }
+//    Return r = c10::Dispatcher::singleton().callUnboxed<Return, Args...>(*this, std::forward<Args>(args)...);
+//    c10::DispatcherOperatorNames::singleton().remove();
+//    return r;
   }
 
   template<class Return, class... Args>
   Return callUnboxedWithDispatchKey(DispatchKey dispatchKey, Args... args) const {
-    //return c10::Dispatcher::singleton().callUnboxedWithDispatchKey<Return, Args...>(*this, dispatchKey, std::forward<Args>(args)...);
-    if(std::is_same<Return, void>::value){
-		c10::Dispatcher::singleton().callUnboxedWithDispatchKey<Return, Args...>(*this, dispatchKey, std::forward<Args>(args)...);
-    	c10::DispatcherOperatorNames::singleton().remove();
-    	return;
-    }
-    Return r = c10::Dispatcher::singleton().callUnboxedWithDispatchKey<Return, Args...>(*this, dispatchKey, std::forward<Args>(args)...);
-    c10::DispatcherOperatorNames::singleton().remove();
-	return r;
+    return c10::Dispatcher::singleton().callUnboxedWithDispatchKey<Return, Args...>(*this, dispatchKey, std::forward<Args>(args)...);
+//    if(std::is_same<Return, void>::value){
+//		c10::Dispatcher::singleton().callUnboxedWithDispatchKey<Return, Args...>(*this, dispatchKey, std::forward<Args>(args)...);
+//    	c10::DispatcherOperatorNames::singleton().remove();
+//    	return;
+//    }
+//    Return r = c10::Dispatcher::singleton().callUnboxedWithDispatchKey<Return, Args...>(*this, dispatchKey, std::forward<Args>(args)...);
+//    c10::DispatcherOperatorNames::singleton().remove();
+//	return r;
   }
 
   void callBoxed(Stack* stack) const {
     c10::Dispatcher::singleton().callBoxed(*this, stack);
-    c10::DispatcherOperatorNames::singleton().remove();
+//    c10::DispatcherOperatorNames::singleton().remove();
   }
 
 private:
