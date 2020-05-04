@@ -77,6 +77,8 @@ inline Return KernelFunction::callUnboxed(const OperatorHandle& opHandle, Args..
     }
 
     TORCH_INTERNAL_ASSERT_DEBUG_ONLY(boxed_kernel_func_ != nullptr, "Tried to call KernelFunction::callUnboxed() on an uninitialized KernelFunction.");
+	LOG(WARNING) << "DispatcherOperatorNames::callUnboxed remove tid " << gettid() << " pid: " << getpid()  << " thread id " << std::this_thread::get_id();
+	c10::DispatcherOperatorNames::singleton().remove();
     return impl::boxAndCallBoxedFunc<Return, Args...>(boxed_kernel_func_, getFunctor_(), opHandle, std::forward<Args>(args)...);
 }
 
