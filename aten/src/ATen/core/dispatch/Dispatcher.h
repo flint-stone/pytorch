@@ -6,6 +6,7 @@
 #include <c10/util/Exception.h>
 #include <c10/util/LeftRight.h>
 
+#include <type_traits>
 #include <unistd.h>
 #include <mutex>
 #include <list>
@@ -257,6 +258,11 @@ public:
   template<class Return, class... Args>
   Return callUnboxed(Args... args) const {
     //return c10::Dispatcher::singleton().callUnboxed<Return, Args...>(*this, std::forward<Args>(args)...);
+    if(std::is_same<Return, void>::value){
+		c10::Dispatcher::singleton().callUnboxed<Return, Args...>(*this, std::forward<Args>(args)...);
+		c10::DispatcherOperatorNames::singleton().remove();
+    	return;
+    }
     Return r = c10::Dispatcher::singleton().callUnboxed<Return, Args...>(*this, std::forward<Args>(args)...);
     c10::DispatcherOperatorNames::singleton().remove();
     return r;
@@ -265,6 +271,11 @@ public:
   template<class Return, class... Args>
   Return callUnboxedWithDispatchKey(DispatchKey dispatchKey, Args... args) const {
     //return c10::Dispatcher::singleton().callUnboxedWithDispatchKey<Return, Args...>(*this, dispatchKey, std::forward<Args>(args)...);
+    if(std::is_same<Return, void>::value){
+		c10::Dispatcher::singleton().callUnboxedWithDispatchKey<Return, Args...>(*this, dispatchKey, std::forward<Args>(args)...);
+    	c10::DispatcherOperatorNames::singleton().remove();
+    	return;
+    }
     Return r = c10::Dispatcher::singleton().callUnboxedWithDispatchKey<Return, Args...>(*this, dispatchKey, std::forward<Args>(args)...);
     c10::DispatcherOperatorNames::singleton().remove();
 	return r;
