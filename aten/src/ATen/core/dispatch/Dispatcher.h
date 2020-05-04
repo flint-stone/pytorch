@@ -330,7 +330,12 @@ inline void Dispatcher::callBoxed(const OperatorHandle& op, Stack* stack) const 
 
 inline const KernelFunction& Dispatcher::dispatch_(const DispatchTable& dispatchTable, DispatchKey dispatchKey) const {
   const KernelFunction* backendKernel = dispatchTable.lookup(dispatchKey);
-  LOG(WARNING) << "Dispatcher::dispatch_ " +  std::string(toString(dispatchKey))<< " tid " << gettid() << " pid: " << getpid()  << " thread id " << std::this_thread::get_id() << " history size: " << c10::DispatcherOperatorNames::singleton().size()  ;
+  LOG(WARNING) << "Dispatcher::dispatch_ " +  std::string(toString(dispatchKey))
+  << " tid " << gettid()
+  << " pid: " << getpid()
+  << " thread id " << std::this_thread::get_id()
+  << " history size: " << c10::DispatcherOperatorNames::singleton().size()
+  << " opeartor_count: " << c10::DispatcherOperatorNames::singleton().opeartor_count();
   //std::string list_of_names = "List of names: " + c10::DispatcherOperatorNames::singleton().readNames();
   //LOG(WARNING) << "Dispatcher::list of operators: size " <<c10:: DispatcherOperatorNames::singleton().size() << " -- " << list_of_names;
   if (nullptr != backendKernel) {

@@ -48,6 +48,7 @@ namespace c10 {
 	void remove(){
 		mutex_ -> lock();
 		operation_count_--;
+		LOG(WARNING) << "DispatcherOperatorNames::remove " +  std::string(toString(dispatchKey))<< " tid " << gettid() << " pid: " << getpid()  << " thread id " << std::this_thread::get_id() << " count: " << operation_count_;
 		mutex_ -> unlock();
 	}
 
@@ -72,6 +73,16 @@ namespace c10 {
 		mutex_->unlock();
 		return ret;
 	}
+
+	int opeartor_count(){
+		int ret = 0;
+		mutex_->lock();
+		//std::lock_guard<std::mutex> lock(mutex_);
+		ret = list->size();
+		mutex_->unlock();
+		return operation_count_;
+	}
+
 
 };
 
