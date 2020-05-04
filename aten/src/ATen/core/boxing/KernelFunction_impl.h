@@ -1,4 +1,12 @@
 #include <ATen/core/boxing/boxing.h>
+#include <c10/util/Logging.h>
+#include <unistd.h>
+#include <mutex>
+#include <list>
+#include <thread>
+#include <string>
+#include <sys/syscall.h>
+#define gettid() syscall(SYS_gettid)
 
 namespace c10 {
 
@@ -52,6 +60,7 @@ inline void KernelFunction::callBoxed(const OperatorHandle& opHandle, Stack* sta
     }
 
     (*boxed_kernel_func_)(getFunctor_(), opHandle, stack);
+	LOG(WARNING) << "DispatcherOperatorNames::callBoxed remove tid " << gettid() << " pid: " << getpid()  << " thread id " << std::this_thread::get_id();
 	c10::DispatcherOperatorNames::singleton().remove();
 }
 

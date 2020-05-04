@@ -2,6 +2,7 @@
 
 // This file contains boxing (not unboxing) logic,
 // i.e. how to make a vector<IValue> from a set of concrete arguments.
+#include <c10/util/Logging.h>
 
 #include <ATen/core/ivalue.h>
 #include <c10/core/TensorOptions.h>
@@ -52,6 +53,7 @@ boxAndCallBoxedFunc(KernelFunction::InternalBoxedKernelFunction* boxed_kernel_fu
   (*boxed_kernel_func)(functor, opHandle, &stack);
 
   TORCH_INTERNAL_ASSERT(stack.size() == 1, "A boxed kernel should only push one return to the stack");
+  LOG(WARNING) << "boxing::boxAndCallBoxedFunc remove tid " << gettid() << " pid: " << getpid()  << " thread id " << std::this_thread::get_id();
   c10::DispatcherOperatorNames::singleton().remove();
   return std::move(stack[0]).to<Result>();
 }
@@ -65,6 +67,7 @@ boxAndCallBoxedFunc(KernelFunction::InternalBoxedKernelFunction* boxed_kernel_fu
   torch::jit::push(stack, std::forward<Args>(args)...);
 
   (*boxed_kernel_func)(functor, opHandle, &stack);
+  LOG(WARNING) << "boxing::boxAndCallBoxedFunc remove tid " << gettid() << " pid: " << getpid()  << " thread id " << std::this_thread::get_id();
   c10::DispatcherOperatorNames::singleton().remove();
   TORCH_INTERNAL_ASSERT(stack.size() == 0, "A boxed kernel returned a value but when we called it with KernelFunction::callUnboxed, we expected it to return void.");
 }

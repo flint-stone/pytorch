@@ -77,11 +77,6 @@ namespace c10 {
 	}
 
 	int opeartor_count(){
-		int ret = 0;
-		mutex_->lock();
-		//std::lock_guard<std::mutex> lock(mutex_);
-		ret = list->size();
-		mutex_->unlock();
 		return operation_count_;
 	}
 
