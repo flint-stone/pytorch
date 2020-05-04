@@ -24,6 +24,21 @@ inline KernelFunction::KernelFunction(std::function<std::unique_ptr<OperatorKern
 , unboxed_kernel_func_(unboxed_kernel_func)
 {}
 
+class CAFFE2_API DispatcherOperatorNamesDummyPrinter{
+private:
+	std::string func_;
+public:
+	DispatcherOperatorNamesDummyPrinter(std::string func_name){
+		func_=func_name;
+	}
+
+	~DispatcherOperatorNamesDummyPrinter(){
+		LOG(WARNING) << "DispatcherOperatorNames:: "<< func_ <<"remove tid " << gettid() << " pid: " << getpid()  << " thread id " << std::this_thread::get_id();
+		c10::DispatcherOperatorNames::singleton().remove();
+	}
+
+};
+
 template<KernelFunction::BoxedKernelFunction* func>
 inline void KernelFunction::make_boxed_function(OperatorKernel*, const OperatorHandle& opHandle, Stack* stack) {
     func(opHandle, stack);
@@ -50,6 +65,7 @@ inline bool KernelFunction::isFallthrough() const {
 }
 
 inline void KernelFunction::callBoxed(const OperatorHandle& opHandle, Stack* stack) const {
+	DispatcherOperatorNamesDummyPrinter dummyPrinter("callBoxed");
     if (C10_UNLIKELY(boxed_kernel_func_ == nullptr)) {
         if (unboxed_kernel_func_ == nullptr) {
             TORCH_INTERNAL_ASSERT(false, "Tried to call KernelFunction::callBoxed() on an uninitialized KernelFunction.");
@@ -60,8 +76,8 @@ inline void KernelFunction::callBoxed(const OperatorHandle& opHandle, Stack* sta
     }
 
     (*boxed_kernel_func_)(getFunctor_(), opHandle, stack);
-	LOG(WARNING) << "DispatcherOperatorNames::callBoxed remove tid " << gettid() << " pid: " << getpid()  << " thread id " << std::this_thread::get_id();
-	c10::DispatcherOperatorNames::singleton().remove();
+	//LOG(WARNING) << "DispatcherOperatorNames::callBoxed remove tid " << gettid() << " pid: " << getpid()  << " thread id " << std::this_thread::get_id();
+	//c10::DispatcherOperatorNames::singleton().remove();
 }
 
 template<class Return, class... Args>
@@ -70,6 +86,7 @@ inline Return KernelFunction::callUnboxed(const OperatorHandle& opHandle, Args..
     // forwarding, which would require Args to be deduced, but instead we
     // want callers to explicitly specify the Args.
 
+	DispatcherOperatorNamesDummyPrinter dummyPrinter("callUnboxed");
     if (C10_LIKELY(unboxed_kernel_func_ != nullptr)) {
         using ActualSignature = Return (OperatorKernel*, Args...);
         ActualSignature* func = reinterpret_cast<ActualSignature*>(unboxed_kernel_func_);
@@ -77,8 +94,8 @@ inline Return KernelFunction::callUnboxed(const OperatorHandle& opHandle, Args..
     }
 
     TORCH_INTERNAL_ASSERT_DEBUG_ONLY(boxed_kernel_func_ != nullptr, "Tried to call KernelFunction::callUnboxed() on an uninitialized KernelFunction.");
-	LOG(WARNING) << "DispatcherOperatorNames::callUnboxed remove tid " << gettid() << " pid: " << getpid()  << " thread id " << std::this_thread::get_id();
-	c10::DispatcherOperatorNames::singleton().remove();
+	//LOG(WARNING) << "DispatcherOperatorNames::callUnboxed remove tid " << gettid() << " pid: " << getpid()  << " thread id " << std::this_thread::get_id();
+	//c10::DispatcherOperatorNames::singleton().remove();
     return impl::boxAndCallBoxedFunc<Return, Args...>(boxed_kernel_func_, getFunctor_(), opHandle, std::forward<Args>(args)...);
 }
 
