@@ -256,16 +256,23 @@ public:
 
   template<class Return, class... Args>
   Return callUnboxed(Args... args) const {
-    return c10::Dispatcher::singleton().callUnboxed<Return, Args...>(*this, std::forward<Args>(args)...);
+    //return c10::Dispatcher::singleton().callUnboxed<Return, Args...>(*this, std::forward<Args>(args)...);
+    Return r = c10::Dispatcher::singleton().callUnboxed<Return, Args...>(*this, std::forward<Args>(args)...);
+    c10::DispatcherOperatorNames::singleton().remove());
+    return r;
   }
 
   template<class Return, class... Args>
   Return callUnboxedWithDispatchKey(DispatchKey dispatchKey, Args... args) const {
-    return c10::Dispatcher::singleton().callUnboxedWithDispatchKey<Return, Args...>(*this, dispatchKey, std::forward<Args>(args)...);
+    //return c10::Dispatcher::singleton().callUnboxedWithDispatchKey<Return, Args...>(*this, dispatchKey, std::forward<Args>(args)...);
+    Return r = c10::Dispatcher::singleton().callUnboxedWithDispatchKey<Return, Args...>(*this, dispatchKey, std::forward<Args>(args)...);
+    c10::DispatcherOperatorNames::singleton().remove());
+	return r;
   }
 
   void callBoxed(Stack* stack) const {
     c10::Dispatcher::singleton().callBoxed(*this, stack);
+    c10::DispatcherOperatorNames::singleton().remove());
   }
 
 private:
@@ -287,10 +294,7 @@ inline Return Dispatcher::callUnboxedWithDispatchKey(const OperatorHandle& op, D
   c10::DispatcherOperatorNames::singleton().append(toString(op.schema()));
   const auto& dispatchTable = op.operatorIterator_->op.dispatch_table();
   const KernelFunction& kernel = dispatch_(dispatchTable, dispatchKey);
-  //return kernel.template callUnboxed<Return, Args...>(op, std::forward<Args>(args)...);
-  auto r = kernel.template callUnboxed<Return, Args...>(op, std::forward<Args>(args)...);
-  c10::DispatcherOperatorNames::singleton().remove());
-  return r;
+  return kernel.template callUnboxed<Return, Args...>(op, std::forward<Args>(args)...);
 }
 
 template<class Return, class... Args>
@@ -299,10 +303,7 @@ inline Return Dispatcher::callUnboxed(const OperatorHandle& op, Args... args) co
   const auto& dispatchTable = op.operatorIterator_->op.dispatch_table();
   auto dispatchKey = dispatchTable.dispatchKeyExtractor().getDispatchKeyUnboxed<Args...>(backendsWithoutFallthrough_, args...);
   LOG(WARNING) << "Dispatcher::callUnboxed " +  std::string(toString(dispatchKey)) << " thread id " << std::this_thread::get_id() << " tid " << gettid() << " pid: " << getpid()  << " schema " <<  toString(op.schema()) ;
-  //return callUnboxedWithDispatchKey<Return, Args...>(op, dispatchKey, args...);
-  auto r = callUnboxedWithDispatchKey<Return, Args...>(op, dispatchKey, args...);
-  c10::DispatcherOperatorNames::singleton().remove());
-  return r;
+  return callUnboxedWithDispatchKey<Return, Args...>(op, dispatchKey, args...);
 }
 
 inline void Dispatcher::callBoxed(const OperatorHandle& op, Stack* stack) const {
@@ -314,7 +315,6 @@ inline void Dispatcher::callBoxed(const OperatorHandle& op, Stack* stack) const 
   c10::DispatcherOperatorNames::singleton().append(toString(op.schema()));
   const KernelFunction& kernel = dispatch_(dispatchTable, dispatchKey);
   kernel.callBoxed(op, stack);
-  c10::DispatcherOperatorNames::singleton().remove());
 }
 
 inline const KernelFunction& Dispatcher::dispatch_(const DispatchTable& dispatchTable, DispatchKey dispatchKey) const {
