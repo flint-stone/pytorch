@@ -11,6 +11,8 @@
 #include <list>
 #include <thread>
 #include <string>
+#include <sys/syscall.h>
+#define gettid() syscall(SYS_gettid)
 
 
 namespace c10 {

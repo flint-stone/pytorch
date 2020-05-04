@@ -128,7 +128,7 @@ class DataParallel(Module):
         if output_device is None:
             output_device = device_ids[0]
 
-        warnings.warn("DataParallel: " + str(module))
+        warnings.warn("DataParallel: " + str(module) + " tid: " + str(os.getpid()))
         self.dim = dim
         self.module = module
         self.device_ids = list(map(lambda x: _get_device_index(x, True), device_ids))
