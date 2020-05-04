@@ -15,9 +15,9 @@ namespace c10 {
 //	static std::list<std::string>* list;
 //	static std::mutex* mutex_;
 //	static int operation_count_;
-	static std::list<std::string>* list;
-	static std::mutex* mutex_;
-	static int operation_count_;
+	std::list<std::string>* list;
+	std::mutex* mutex_;
+	int operation_count_;
 //	friend class Dispatcher;
 	DispatcherOperatorNames()
 	{
