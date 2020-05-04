@@ -258,7 +258,7 @@ public:
   Return callUnboxed(Args... args) const {
     //return c10::Dispatcher::singleton().callUnboxed<Return, Args...>(*this, std::forward<Args>(args)...);
     Return r = c10::Dispatcher::singleton().callUnboxed<Return, Args...>(*this, std::forward<Args>(args)...);
-    c10::DispatcherOperatorNames::singleton().remove());
+    c10::DispatcherOperatorNames::singleton().remove();
     return r;
   }
 
@@ -266,13 +266,13 @@ public:
   Return callUnboxedWithDispatchKey(DispatchKey dispatchKey, Args... args) const {
     //return c10::Dispatcher::singleton().callUnboxedWithDispatchKey<Return, Args...>(*this, dispatchKey, std::forward<Args>(args)...);
     Return r = c10::Dispatcher::singleton().callUnboxedWithDispatchKey<Return, Args...>(*this, dispatchKey, std::forward<Args>(args)...);
-    c10::DispatcherOperatorNames::singleton().remove());
+    c10::DispatcherOperatorNames::singleton().remove();
 	return r;
   }
 
   void callBoxed(Stack* stack) const {
     c10::Dispatcher::singleton().callBoxed(*this, stack);
-    c10::DispatcherOperatorNames::singleton().remove());
+    c10::DispatcherOperatorNames::singleton().remove();
   }
 
 private:
