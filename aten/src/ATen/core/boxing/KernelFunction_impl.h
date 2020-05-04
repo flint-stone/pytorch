@@ -76,7 +76,7 @@ inline KernelFunction KernelFunction::makeFromBoxedFunction() {
     return KernelFunction(
         nullptr,  // no functorFactory_, this can only be called in a boxed way.
         nullptr,  // no functor_ object either
-        &make_boxed_function<func>,Ker
+        &make_boxed_function<func>,
         nullptr  // no unboxed function pointer
     );
 }
