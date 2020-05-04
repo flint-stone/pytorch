@@ -183,6 +183,7 @@ class CAFFE2_API DispatcherOperatorNames final {
 private:
 	static std::list<std::string>* list;
 	static std::mutex* mutex_;
+	static int operation_count_;
 //	friend class Dispatcher;
 	DispatcherOperatorNames()
 	{
@@ -203,7 +204,14 @@ public:
 		//std::lock_guard<std::mutex> lock(mutex_);
 		mutex_->lock();
 		list->emplace_back(name);
+		operation_count_++;
 		mutex_->unlock();
+	}
+
+	void remove(){
+		mutex_ -> lock();
+		operation_count_--;
+		mutex_ -> unlock();
 	}
 
 	std::string readNames(){
@@ -279,7 +287,10 @@ inline Return Dispatcher::callUnboxedWithDispatchKey(const OperatorHandle& op, D
   c10::DispatcherOperatorNames::singleton().append(toString(op.schema()));
   const auto& dispatchTable = op.operatorIterator_->op.dispatch_table();
   const KernelFunction& kernel = dispatch_(dispatchTable, dispatchKey);
-  return kernel.template callUnboxed<Return, Args...>(op, std::forward<Args>(args)...);
+  //return kernel.template callUnboxed<Return, Args...>(op, std::forward<Args>(args)...);
+  auto r = kernel.template callUnboxed<Return, Args...>(op, std::forward<Args>(args)...);
+  c10::DispatcherOperatorNames::singleton().remove());
+  return r;
 }
 
 template<class Return, class... Args>
@@ -288,7 +299,10 @@ inline Return Dispatcher::callUnboxed(const OperatorHandle& op, Args... args) co
   const auto& dispatchTable = op.operatorIterator_->op.dispatch_table();
   auto dispatchKey = dispatchTable.dispatchKeyExtractor().getDispatchKeyUnboxed<Args...>(backendsWithoutFallthrough_, args...);
   LOG(WARNING) << "Dispatcher::callUnboxed " +  std::string(toString(dispatchKey)) << " thread id " << std::this_thread::get_id() << " tid " << gettid() << " pid: " << getpid()  << " schema " <<  toString(op.schema()) ;
-  return callUnboxedWithDispatchKey<Return, Args...>(op, dispatchKey, args...);
+  //return callUnboxedWithDispatchKey<Return, Args...>(op, dispatchKey, args...);
+  auto r = callUnboxedWithDispatchKey<Return, Args...>(op, dispatchKey, args...);
+  c10::DispatcherOperatorNames::singleton().remove());
+  return r;
 }
 
 inline void Dispatcher::callBoxed(const OperatorHandle& op, Stack* stack) const {
@@ -300,6 +314,7 @@ inline void Dispatcher::callBoxed(const OperatorHandle& op, Stack* stack) const 
   c10::DispatcherOperatorNames::singleton().append(toString(op.schema()));
   const KernelFunction& kernel = dispatch_(dispatchTable, dispatchKey);
   kernel.callBoxed(op, stack);
+  c10::DispatcherOperatorNames::singleton().remove());
 }
 
 inline const KernelFunction& Dispatcher::dispatch_(const DispatchTable& dispatchTable, DispatchKey dispatchKey) const {
