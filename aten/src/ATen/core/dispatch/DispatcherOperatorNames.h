@@ -12,12 +12,18 @@ namespace c10 {
 
 	class CAFFE2_API DispatcherOperatorNames final {
 	private:
+//	static std::list<std::string>* list;
+//	static std::mutex* mutex_;
+//	static int operation_count_;
 	static std::list<std::string>* list;
 	static std::mutex* mutex_;
 	static int operation_count_;
 //	friend class Dispatcher;
 	DispatcherOperatorNames()
 	{
+		DispatcherOperatorNames::list = new std::list<std::string>();
+		DispatcherOperatorNames::mutex_ = new std::mutex();
+		operation_count_ = 0;
 		LOG(WARNING) << "DispatcherOperatorNames init: " << " thread id " << std::this_thread::get_id() << " pid: " << getpid();
 	}
 	DispatcherOperatorNames(DispatcherOperatorNames const& copy);
@@ -70,8 +76,8 @@ namespace c10 {
 };
 
 
-std::list<std::string>* DispatcherOperatorNames::list = new std::list<std::string>();
-std::mutex* DispatcherOperatorNames::mutex_ = new std::mutex();
-int operation_count_ = 0;
+//std::list<std::string>* DispatcherOperatorNames::list = new std::list<std::string>();
+//std::mutex* DispatcherOperatorNames::mutex_ = new std::mutex();
+//int operation_count_ = 0;
 
 }
