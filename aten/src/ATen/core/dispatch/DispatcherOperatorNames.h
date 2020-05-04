@@ -8,6 +8,8 @@
 #include <thread>
 #include <string>
 #include <sys/syscall.h>
+#define gettid() syscall(SYS_gettid)
+
 namespace c10 {
 
 	class CAFFE2_API DispatcherOperatorNames final {
@@ -48,7 +50,7 @@ namespace c10 {
 	void remove(){
 		mutex_ -> lock();
 		operation_count_--;
-		LOG(WARNING) << "DispatcherOperatorNames::remove " +  std::string(toString(dispatchKey))<< " tid " << gettid() << " pid: " << getpid()  << " thread id " << std::this_thread::get_id() << " count: " << operation_count_;
+		LOG(WARNING) << "DispatcherOperatorNames::remove tid " << gettid() << " pid: " << getpid()  << " thread id " << std::this_thread::get_id() << " count: " << operation_count_;
 		mutex_ -> unlock();
 	}
 
