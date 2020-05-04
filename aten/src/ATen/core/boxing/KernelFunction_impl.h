@@ -1,5 +1,8 @@
-#include <ATen/core/boxing/boxing.h>
 #include <c10/util/Logging.h>
+
+#include <ATen/core/boxing/boxing.h>
+#include <ATen/core/dispatch/DispatcherOperatorNames.h>
+
 #include <unistd.h>
 #include <mutex>
 #include <list>
