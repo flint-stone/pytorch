@@ -75,6 +75,7 @@ class Backend(object):
                              "on CPU tensors.")
         elif value == Backend.UNDEFINED:
             raise ValueError("Invalid backend: '{}'".format(name))
+        warnings.warn('comm: Initialize backend {}'.format(name))
         return value
 
 # `_backend`, `dist_backend`, and `reduce_op` are here to maintain backward
@@ -484,6 +485,7 @@ def _new_process_group_helper(world_size,
                 timeout)
             _pg_map[pg] = (Backend.NCCL, store)
             _pg_names[pg] = group_name
+            warnings.warn('comm: Initialize NCCL Process Group {} {} {}'.format(rank, world_size, timeout))
         else:
             raise RuntimeError("Unsupported distributed backend by group")
 
@@ -602,6 +604,7 @@ def isend(tensor,
         None, if not part of the group
 
     """
+    warnings.warn("comm: isend dst " + str(dst))
     _check_single_tensor(tensor, "tensor")
     if _rank_not_in_group(group):
         return
@@ -632,6 +635,7 @@ def irecv(tensor,
         None, if not part of the group
 
     """
+    warnings.warn("comm: irecv src " + str(src))
     _check_single_tensor(tensor, "tensor")
     if _rank_not_in_group(group):
         return
@@ -658,6 +662,7 @@ def send(tensor,
         tag (int, optional): Tag to match send with remote recv
 
     """
+    warnings.warn("comm: send dst " + str(dst))
     _check_single_tensor(tensor, "tensor")
     if _rank_not_in_group(group):
         return
@@ -689,6 +694,7 @@ def recv(tensor,
         -1, if not part of the group
 
     """
+    warnings.warn("comm: send src " + str(dst))
     _check_single_tensor(tensor, "tensor")
     if _rank_not_in_group(group):
         return -1
@@ -751,6 +757,7 @@ def broadcast_multigpu(tensor_list,
         None, if not async_op or if not part of the group
 
     """
+    warnings.warn("comm: broadcast_multigpu " + str(src) + " src_tensor " + str(src_tensor) + " async op " + str(async_op))
     if _rank_not_in_group(group):
         return
 
@@ -793,6 +800,7 @@ def broadcast(tensor,
         None, if not async_op or if not part of the group
 
     """
+    warnings.warn("comm: broadcast " + str(src)  + " async op " + str(async_op))
     _check_single_tensor(tensor, "tensor")
     if _rank_not_in_group(group):
         return
@@ -848,6 +856,7 @@ def all_reduce_multigpu(tensor_list,
         None, if not async_op or if not part of the group
 
     """
+    warnings.warn("comm: all_reduce_multigpu  op " + str(op) + " group " + str(group) + " async op " + str(async_op))
     if _rank_not_in_group(group):
         return
 
@@ -889,6 +898,7 @@ def all_reduce(tensor,
         None, if not async_op or if not part of the group
 
     """
+    warnings.warn("comm: all_reduce op " + str(op) + " group " + str(group) + " async op " + str(async_op))
     _check_single_tensor(tensor, "tensor")
     if _rank_not_in_group(group):
         return
@@ -940,6 +950,7 @@ def all_reduce_coalesced(tensors,
         None, if not async_op or if not part of the group.
 
     """
+    warnings.warn("comm: all_reduce_coalesced op " + str(op) + " group " + str(group) + " async op " + str(async_op))
     _check_tensor_list(tensors, "tensor")
     if _rank_not_in_group(group):
         return
@@ -993,6 +1004,7 @@ def reduce_multigpu(tensor_list,
         None, otherwise
 
     """
+    warnings.warn("comm: reduce_multigpu op " + str(op) + " dst: " + str(dst)  + " group " + str(group) + " async op " + str(async_op) + " dst_tensor " + str(dst_tensor))
     if _rank_not_in_group(group):
         return
 
@@ -1040,6 +1052,7 @@ def reduce(tensor,
         None, if not async_op or if not part of the group
 
     """
+    warnings.warn("comm: reduce op " + str(op) + " dst: " + str(dst)  + " group " + str(group) + " async op " + str(async_op))
     _check_single_tensor(tensor, "tensor")
     if _rank_not_in_group(group):
         return
@@ -1105,6 +1118,7 @@ def all_gather_multigpu(output_tensor_lists,
         None, if not async_op or if not part of the group
 
     """
+    warnings.warn("comm: all_gather_multigpu group " + str(group) + " async op " + str(async_op))
     if _rank_not_in_group(group):
         return
 
@@ -1139,6 +1153,7 @@ def all_gather(tensor_list,
         None, if not async_op or if not part of the group
 
     """
+    warnings.warn("comm: all_gather group " + str(group) + " async op " + str(async_op))
     _check_tensor_list(tensor_list, "tensor_list")
     _check_single_tensor(tensor, "tensor")
     if _rank_not_in_group(group):
@@ -1201,6 +1216,7 @@ def all_gather_coalesced(output_tensor_lists,
     """
     # We only check basic compatibility with C++ params here, C++ code will
     # do shape and type checking.
+    warnings.warn("comm: all_gather_coalesced group " + str(group) + " async op " + str(async_op))
     if _rank_not_in_group(group):
         return
     _check_tensor_list(input_tensor_list, "tensor_list")
@@ -1245,6 +1261,7 @@ def gather(tensor,
         None, if not async_op or if not part of the group
 
     """
+    warnings.warn("comm: gather dst " + str(dst) + " group " + str(group)  + " async op " + str(async_op))
     _check_single_tensor(tensor, "tensor")
 
     # Parameter ``gather_list`` may be left unspecified on non-dst ranks.
@@ -1311,6 +1328,7 @@ def scatter(tensor,
         None, if not async_op or if not part of the group
 
     """
+    warnings.warn("comm: scatter src " + str(src) + " group " + str(group)  + " async op " + str(async_op))
     _check_single_tensor(tensor, "tensor")
 
     # Parameter ``scatter_list`` may be left unspecified on non-src ranks.
@@ -1398,6 +1416,7 @@ def reduce_scatter_multigpu(output_tensor_list,
         None, if not async_op or if not part of the group.
 
     """
+    warnings.warn("comm: scatter  group " + str(group)  + " op " + str(op) + " async op " + str(async_op))
     if _rank_not_in_group(group):
         return
 
@@ -1443,6 +1462,7 @@ def reduce_scatter(output,
         None, if not async_op or if not part of the group.
 
     """
+    warnings.warn("comm: reduce_scatter op " + str(op) + " group " + str(group)  + " async op " + str(async_op))
     _check_single_tensor(output, "output")
     _check_tensor_list(input_list, "input_list")
     if _rank_not_in_group(group):
@@ -1479,6 +1499,7 @@ def barrier(group=group.WORLD,
         Async work handle, if async_op is set to True.
         None, if not async_op or if not part of the group
     """
+    warnings.warn("comm: barrier group " + str(group)  + " async op " + str(async_op))
     if _rank_not_in_group(group):
         return
 
