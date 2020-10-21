@@ -17,6 +17,11 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <thread>
+#include <unistd.h>
+#include <string>
+#include <sys/syscall.h>
+#define gettid() syscall(SYS_gettid)
 
 namespace c10 {
 
@@ -191,7 +196,9 @@ class THCCachingAllocator {
 
   THCCachingAllocator() :
       large_blocks(BlockComparator),
-      small_blocks(BlockComparator) {}
+      small_blocks(BlockComparator) {
+      LOG(WARNING) << "THCCachingAllocator init: " << " thread id " << std::this_thread::get_id() << " tid " << gettid() << " pid: " << getpid() ;
+  }
 
   std::mutex* getCudaFreeMutex() const {
     return &cuda_free_mutex;
@@ -203,6 +210,13 @@ class THCCachingAllocator {
   /** allocates a block which is safe to use from the provided stream */
   void malloc(void** devPtr, size_t size, cudaStream_t stream)
   {
+      LOG(WARNING) << "THCCachingAllocator malloc: "
+      << " thread id "
+      << std::this_thread::get_id()
+      << " tid " << gettid()
+      << " pid: " << getpid()
+      << " stream id: " << stream
+      <<  " size: " << size;
     std::lock_guard<std::recursive_mutex> lock(mutex);
 
     int device;
@@ -339,6 +353,11 @@ class THCCachingAllocator {
 
   void free(void* ptr)
   {
+      LOG(WARNING) << "THCCachingAllocator free: "
+                   << " thread id "
+                   << std::this_thread::get_id()
+                   << " tid " << gettid()
+                   << " pid: " << getpid();
     std::lock_guard<std::recursive_mutex> lock(mutex);
     if (!ptr) {
       return;
